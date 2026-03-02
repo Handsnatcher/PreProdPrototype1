@@ -1,6 +1,8 @@
-// TurnManager.cs
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
+using TMPro;
 
 public enum TurnState { PlayerTurn, EnemyTurn, GameOver }
 
@@ -10,6 +12,16 @@ public class TurnManager : MonoBehaviour
 
     [Header("Mana Settings")]
     public int maxMana = 3;
+
+    [Header("UI")]
+    public Button endTurnButton;
+    public TextMeshProUGUI turnText;
+    public TextMeshProUGUI manaText;
+
+    [Header("Turn Text Timing")]
+    public float fadeInDuration = 0.4f;
+    public float displayDuration = 1.5f;
+    public float fadeOutDuration = 0.6f;
 
     [Header("State (Read Only)")]
     [SerializeField] private TurnState currentState;
@@ -32,6 +44,8 @@ public class TurnManager : MonoBehaviour
     public int TurnCount => turnCount;
     public bool IsPlayerTurn => currentState == TurnState.PlayerTurn;
 
+    private Coroutine turnTextCoroutine;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -40,7 +54,20 @@ public class TurnManager : MonoBehaviour
 
     void Start()
     {
+        if (endTurnButton != null)
+            endTurnButton.onClick.AddListener(EndPlayerTurn);
+
+        // Start the turn text fully transparent
+        if (turnText != null)
+            SetTurnTextAlpha(0f);
+
         StartPlayerTurn();
+    }
+
+    void OnDestroy()
+    {
+        if (endTurnButton != null)
+            endTurnButton.onClick.RemoveListener(EndPlayerTurn);
     }
 
     // -------------------------------------------------------------------
@@ -54,14 +81,17 @@ public class TurnManager : MonoBehaviour
         turnCount++;
         currentState = TurnState.PlayerTurn;
 
+        SetEndTurnButtonActive(true);
         RefillMana();
+        ShowTurnText("Your Turn");
         OnPlayerTurnStart?.Invoke();
 
-        Debug.Log($"[Turn {turnCount}] Player Turn Started -- Mana: {currentMana}/{maxMana}");
+        Debug.Log($"[Turn {turnCount}] --- PLAYER TURN ---  Mana: {currentMana}/{maxMana}");
     }
 
     /// <summary>
     /// Call this from your End Turn button or card system.
+    /// Also wired up automatically if you assign endTurnButton in the Inspector.
     /// </summary>
     public void EndPlayerTurn()
     {
@@ -72,9 +102,13 @@ public class TurnManager : MonoBehaviour
         }
 
         currentState = TurnState.EnemyTurn;
+
+        SetEndTurnButtonActive(false);
+        ShowTurnText("Enemy Turn");
+        UpdateManaText();
         OnPlayerTurnEnd?.Invoke();
 
-        Debug.Log($"[Turn {turnCount}] Player Turn Ended");
+        Debug.Log($"[Turn {turnCount}] Player turn ended.");
     }
 
     /// <summary>
@@ -90,7 +124,7 @@ public class TurnManager : MonoBehaviour
 
         OnEnemyTurnEnd?.Invoke();
 
-        Debug.Log($"[Turn {turnCount}] Enemy Turn Ended");
+        Debug.Log($"[Turn {turnCount}] Enemy turn ended.");
 
         StartPlayerTurn();
     }
@@ -102,6 +136,8 @@ public class TurnManager : MonoBehaviour
     {
         if (currentState != TurnState.EnemyTurn) return;
         OnEnemyTurnStart?.Invoke();
+
+        Debug.Log($"[Turn {turnCount}] --- ENEMY TURN ---");
     }
 
     // -------------------------------------------------------------------
@@ -122,12 +158,15 @@ public class TurnManager : MonoBehaviour
 
         if (currentMana < amount)
         {
-            Debug.Log("TurnManager: Not enough mana.");
+            Debug.Log($"TurnManager: Not enough mana. (Have {currentMana}, need {amount})");
             return false;
         }
 
         currentMana -= amount;
         OnManaChanged?.Invoke(currentMana, maxMana);
+        UpdateManaText();
+
+        Debug.Log($"TurnManager: Spent {amount} mana. Remaining: {currentMana}/{maxMana}");
         return true;
     }
 
@@ -138,12 +177,16 @@ public class TurnManager : MonoBehaviour
     {
         currentMana = Mathf.Clamp(currentMana + amount, 0, maxMana);
         OnManaChanged?.Invoke(currentMana, maxMana);
+        UpdateManaText();
+
+        Debug.Log($"TurnManager: Gained {amount} mana. Current: {currentMana}/{maxMana}");
     }
 
     private void RefillMana()
     {
         currentMana = maxMana;
         OnManaChanged?.Invoke(currentMana, maxMana);
+        UpdateManaText();
     }
 
     // -------------------------------------------------------------------
@@ -156,6 +199,75 @@ public class TurnManager : MonoBehaviour
     public void SetGameOver()
     {
         currentState = TurnState.GameOver;
+        SetEndTurnButtonActive(false);
+        ShowTurnText("Game Over");
+        UpdateManaText();
+
         Debug.Log("TurnManager: Game Over.");
+    }
+
+    // -------------------------------------------------------------------
+    // UI HELPERS
+    // -------------------------------------------------------------------
+
+    private void SetEndTurnButtonActive(bool active)
+    {
+        if (endTurnButton != null)
+            endTurnButton.interactable = active;
+    }
+
+    private void ShowTurnText(string message)
+    {
+        if (turnText == null) return;
+
+        // Cancel any existing fade so texts don't overlap
+        if (turnTextCoroutine != null)
+            StopCoroutine(turnTextCoroutine);
+
+        turnText.text = message;
+        turnTextCoroutine = StartCoroutine(FadeTurnText());
+    }
+
+    private IEnumerator FadeTurnText()
+    {
+        // Fade in
+        yield return StartCoroutine(FadeTo(1f, fadeInDuration));
+
+        // Hold
+        yield return new WaitForSeconds(displayDuration);
+
+        // Fade out
+        yield return StartCoroutine(FadeTo(0f, fadeOutDuration));
+    }
+
+    private IEnumerator FadeTo(float targetAlpha, float duration)
+    {
+        float startAlpha = turnText.color.a;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / duration);
+            SetTurnTextAlpha(alpha);
+            yield return null;
+        }
+
+        SetTurnTextAlpha(targetAlpha);
+    }
+
+    private void SetTurnTextAlpha(float alpha)
+    {
+        Color c = turnText.color;
+        c.a = alpha;
+        turnText.color = c;
+    }
+
+    private void UpdateManaText()
+    {
+        if (manaText != null)
+            manaText.text = currentState == TurnState.PlayerTurn
+                ? $"Mana: {currentMana} / {maxMana}"
+                : "Mana: - / -";
     }
 }
