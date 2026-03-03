@@ -70,9 +70,7 @@ public class TurnManager : MonoBehaviour
             endTurnButton.onClick.RemoveListener(EndPlayerTurn);
     }
 
-    // -------------------------------------------------------------------
     // TURN FLOW
-    // -------------------------------------------------------------------
 
     public void StartPlayerTurn()
     {
@@ -140,9 +138,7 @@ public class TurnManager : MonoBehaviour
         Debug.Log($"[Turn {turnCount}] --- ENEMY TURN ---");
     }
 
-    // -------------------------------------------------------------------
     // MANA
-    // -------------------------------------------------------------------
 
     /// <summary>
     /// Attempts to spend mana. Returns true if successful.
@@ -189,9 +185,7 @@ public class TurnManager : MonoBehaviour
         UpdateManaText();
     }
 
-    // -------------------------------------------------------------------
     // GAME OVER
-    // -------------------------------------------------------------------
 
     /// <summary>
     /// Call this from the player or enemy system when combat ends.
@@ -206,9 +200,7 @@ public class TurnManager : MonoBehaviour
         Debug.Log("TurnManager: Game Over.");
     }
 
-    // -------------------------------------------------------------------
     // UI HELPERS
-    // -------------------------------------------------------------------
 
     private void SetEndTurnButtonActive(bool active)
     {
