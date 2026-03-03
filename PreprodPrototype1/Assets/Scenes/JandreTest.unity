@@ -256,6 +256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df85a823058df6e43bf46580c4cd4e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyBehaviour: {fileID: 1493934410}
   maxMana: 3
   endTurnButton: {fileID: 1740125426}
   turnText: {fileID: 1491024506}
@@ -836,6 +837,7 @@ GameObject:
   - component: {fileID: 1493934408}
   - component: {fileID: 1493934407}
   - component: {fileID: 1493934406}
+  - component: {fileID: 1493934410}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -931,6 +933,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1493934410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493934405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dc022089d4613443a50d973d81262a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  attackDamage: 10
+  defenseValue: 10
+  enemyMesh: {fileID: 0}
+  enemyIdle: {fileID: 0}
+  enemyAttack: {fileID: 0}
+  enemyDefense: {fileID: 0}
+  enemySkill: {fileID: 0}
 --- !u!1 &1628436779
 GameObject:
   m_ObjectHideFlags: 0

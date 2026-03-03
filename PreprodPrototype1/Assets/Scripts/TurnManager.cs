@@ -9,6 +9,7 @@ public enum TurnState { PlayerTurn, EnemyTurn, GameOver }
 public class TurnManager : MonoBehaviour
 {
     public static TurnManager Instance { get; private set; }
+    public EnemyBehaviour enemyBehaviour;
 
     [Header("Mana Settings")]
     public int maxMana = 3;
@@ -107,6 +108,10 @@ public class TurnManager : MonoBehaviour
         OnPlayerTurnEnd?.Invoke();
 
         Debug.Log($"[Turn {turnCount}] Player turn ended.");
+        if (enemyBehaviour)
+        {
+            enemyBehaviour.EnemyStart(); //call enemy start from EnemyBehaviour
+        }
     }
 
     /// <summary>
