@@ -35,13 +35,13 @@ Material:
     m_Floats:
     - _InkScale: 3
     - _InkStrength: 0.3
-    - _OutlineWidth: 0.04
+    - _OutlineWidth: 0.02
     - _RimPower: 3
     - _ShadowSmooth: 0.05
     - _ShadowSteps: 3
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 0, g: 0.7924528, b: 0.03895188, a: 1}
-    - _ShadowColor: {r: 0.13581344, g: 0.21157682, b: 0.26415092, a: 1}
+    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadowColor: {r: 0.2, g: 0.2, b: 0.3, a: 1}
   m_BuildTextureStacks: []
