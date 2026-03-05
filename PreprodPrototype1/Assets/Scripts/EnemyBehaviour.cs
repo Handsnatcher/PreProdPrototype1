@@ -7,13 +7,16 @@ public class EnemyBehaviour : MonoBehaviour
 
     //enemy attributes
     GameObject[] enemies; 
-    public int maxHealth = 100;      //max health
-    public int attackDamage = 10;   //damage value when attacking
-    public int defenseValue = 10;   //how many hit points can it defend itself from
+    public int enemyMaxHealth = 100;         //max health
+    public int enemyAttackCardDamage = 10;   //damage value when attacking
+    public int enemyDefenseCardValue = 10;   //how many hit points can it defend itself from
+
+
     public enum difficulty { easy, medium, difficult }; //affects "smartness" of AI
 
-    private int health;
-    private float timer;
+    public int enemyCurrentHealth;
+    public int enemyCurrentEnemyDefensePoints;    //how many hit points to negate
+
     private Coroutine enemyThinkingCoroutine;
 
     //design attributes
@@ -28,12 +31,12 @@ public class EnemyBehaviour : MonoBehaviour
 
     void Start()
     {
-        health = maxHealth;
+        enemyCurrentHealth = enemyMaxHealth;
     }
 
     public void EnemyStart()
     {
-        if (health > 0)
+        if (enemyCurrentHealth > 0)
         {
             enemyThinkingCoroutine = StartCoroutine(EnemyThinking());
         }
