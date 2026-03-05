@@ -34,6 +34,12 @@ public class MapManager : MonoBehaviour
             }
         }
 
+        // boss node
+        Node bossNode = Instantiate(nodeObject, canvasTransform).GetComponent<Node>();
+        bossNode.transform.localPosition = new Vector3(0, (gridHeight / 2 + 1) * 100, 0);
+
+        bossNode.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = bossNode.nodeType.ToString()[0].ToString();
+
         int connectionSize;
         int firstRowConnectionCount = 0;
 
@@ -248,9 +254,12 @@ public class MapManager : MonoBehaviour
                         }
                     }
                 }
-                else if (p.Key.y == (gridHeight - 1))
+                else if (p.Key.y == (gridHeight - 1)) // last row
                 {
-
+                    if (p.Value.connectedNodes.Count > 0)
+                    {
+                        p.Value.connectedNodes.Add(bossNode);
+                    }
                 }
                 else // in between rows
                 {
