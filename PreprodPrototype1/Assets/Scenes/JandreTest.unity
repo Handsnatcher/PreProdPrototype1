@@ -94,7 +94,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 08eb000482828e241ad3f04a8327458e,
+    type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -210,6 +211,7 @@ GameObject:
   - component: {fileID: 415972449}
   - component: {fileID: 415972448}
   - component: {fileID: 415972450}
+  - component: {fileID: 415972451}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -294,6 +296,33 @@ MonoBehaviour:
   inkTexture: {fileID: 0}
   inkStrength: 0.3
   inkScale: 3
+--- !u!114 &415972451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415972447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e266fa72345a4644b87aa71473f9363, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glassShardMaterial: {fileID: 2100000, guid: bb2e033cc1089844c9c99ba2109af3da, type: 2}
+  planeDistance: 0.5
+  shardDepth: 0.02
+  cols: 5
+  rows: 4
+  jitter: 0.25
+  crackDuration: 0.6
+  fallStagger: 0.8
+  edgesFirst: 0
+  fallForce: 1.5
+  torqueStrength: 8
+  shardLifetime: 3
+  fadeDuration: 0.8
+  targetCamera: {fileID: 1317043173}
+  debugKey: 1
 --- !u!1001 &564786182
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -389,9 +418,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dc022089d4613443a50d973d81262a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  attackDamage: 10
-  defenseValue: 10
+  enemyMaxHealth: 100
+  enemyAttackCardDamage: 10
+  enemyDefenseCardValue: 10
+  enemyCurrentHealth: 0
+  enemyCurrentEnemyDefensePoints: 0
   enemyMesh: {fileID: 0}
   enemyIdle: {fileID: 0}
   enemyAttack: {fileID: 0}
@@ -522,7 +553,7 @@ GameObject:
   - component: {fileID: 1317043175}
   m_Layer: 0
   m_Name: MainCamera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -794,6 +825,71 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1381790868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1381790870}
+  - component: {fileID: 1381790869}
+  m_Layer: 0
+  m_Name: Reflection Probe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!215 &1381790869
+ReflectionProbe:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381790868}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Type: 0
+  m_Mode: 0
+  m_RefreshMode: 0
+  m_TimeSlicingMode: 0
+  m_Resolution: 128
+  m_UpdateFrequency: 0
+  m_BoxSize: {x: 50, y: 50, z: 50}
+  m_BoxOffset: {x: 0, y: 0, z: 0}
+  m_NearClip: 0.3
+  m_FarClip: 1000
+  m_ShadowDistance: 100
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IntensityMultiplier: 1
+  m_BlendDistance: 1
+  m_HDR: 1
+  m_BoxProjection: 0
+  m_RenderDynamicObjects: 0
+  m_UseOcclusionCulling: 1
+  m_Importance: 1
+  m_CustomBakedTexture: {fileID: 0}
+--- !u!4 &1381790870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381790868}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.44, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1518,3 +1614,4 @@ SceneRoots:
   - {fileID: 1372751364}
   - {fileID: 277909865}
   - {fileID: 564786182}
+  - {fileID: 1381790870}
