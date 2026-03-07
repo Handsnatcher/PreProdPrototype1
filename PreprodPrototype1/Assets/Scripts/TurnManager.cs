@@ -94,6 +94,7 @@ public class TurnManager : MonoBehaviour
     /// </summary>
     public void EndPlayerTurn()
     {
+        Debug.Log("EndPlayerTurn triggered");
         if (currentState != TurnState.PlayerTurn)
         {
             Debug.LogWarning("TurnManager: Tried to end player turn outside of PlayerTurn state.");
@@ -108,10 +109,19 @@ public class TurnManager : MonoBehaviour
         OnPlayerTurnEnd?.Invoke();
 
         Debug.Log($"[Turn {turnCount}] Player turn ended.");
-        if (enemyBehaviour)
-        {
-            enemyBehaviour.EnemyStart(); //call enemy start from EnemyBehaviour
-        }
+        StartCoroutine(EnemyTurnRoutine());
+    }
+
+    IEnumerator EnemyTurnRoutine()
+    {
+        NotifyEnemyTurnStarted();
+
+        Debug.Log("Enemy thinking......");
+        yield return new WaitForSeconds(2.0f);
+
+        enemyBehaviour.EnemyTurn();
+
+        EndEnemyTurn();
     }
 
     /// <summary>

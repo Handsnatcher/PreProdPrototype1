@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
+    public Player player;
 
     //enemy attributes
     GameObject[] enemies; 
@@ -11,13 +13,12 @@ public class EnemyBehaviour : MonoBehaviour
     public int enemyAttackCardDamage = 10;   //damage value when attacking
     public int enemyDefenseCardValue = 10;   //how many hit points can it defend itself from
 
-
-    public enum difficulty { easy, medium, difficult }; //affects "smartness" of AI
+    public enum enemyDifficulty { easy, medium, difficult }; //affects "smartness" of AI
 
     public int enemyCurrentHealth;
-    public int enemyCurrentEnemyDefensePoints;    //how many hit points to negate
+    public int enemyCurrentDefense; //how many hit points to negate
 
-    private Coroutine enemyThinkingCoroutine;
+    private Coroutine enemyThinkingCoroutine = null;
 
     //design attributes
     [SerializeField] private Mesh enemyMesh;        //model
@@ -34,42 +35,69 @@ public class EnemyBehaviour : MonoBehaviour
         enemyCurrentHealth = enemyMaxHealth;
     }
 
-    public void EnemyStart()
-    {
-        if (enemyCurrentHealth > 0)
-        {
-            enemyThinkingCoroutine = StartCoroutine(EnemyThinking());
-        }
-    }
+    //public void EnemyStart()
+    //{
+    //    Debug.Log("EnemyStart called");
 
-    private IEnumerator EnemyThinking()
-    {
-        Debug.Log("Enemy thinking......");
+    //    if (enemyThinkingCoroutine == null)
+    //    {
+    //        if (enemyCurrentHealth > 0)
+    //        {
+    //            TurnManager.Instance.NotifyEnemyTurnStarted();
+    //            enemyThinkingCoroutine = StartCoroutine(EnemyThinking());
+    //        }
+    //    }
 
-        yield return new WaitForSeconds(2.0f); //how long the enemy "thinks" for
+    //}
 
-        EnemyTurn();
-    }
+    //private IEnumerator EnemyThinking()
+    //{
+    //    Debug.Log("Enemy thinking......");
+
+    //    yield return new WaitForSeconds(2.0f); //how long the enemy "thinks" for
+
+    //    EnemyTurn();
+
+    //    enemyThinkingCoroutine = null;
+
+    //}
 
     //FOR DEBUG PURPOSES, SIMPLE ENEMY TURN
-    private void EnemyTurn()
+    public void EnemyTurn()
     {
         //random chance to attack vs defend
         if (Random.value < 0.5f)
         {
             Debug.Log("Enemy Attacked!");
+            if (player)
+            {
+                //NOTE: damage value can be changed depending on difficulty later (for now default is 10)
+                player.TakeDamage();
+
+                //show damage UI
+            }
         }
         else
         {
             Debug.Log("Enemy Defended!");
+            EnemyDefense();
         }
 
         TurnManager.Instance.EndEnemyTurn();
     }
 
+    private void EnemyDefense()
+    {
+        enemyCurrentDefense = enemyCurrentDefense + enemyDefenseCardValue;
+    }
 
 
-    //enemy defeated
+    //enemy take damage (CALL WHEN PLAY CARD)
+    public void EnemyTakeDamage(int damage)
+    {
+        int finalDamage = Mathf.Max(damage - enemyCurrentDefense, 0);   //to make sure defense doesnt heal enemy on accident
+        enemyCurrentHealth -= finalDamage;
+    }
 
 
     ///////////////////////////////ANIMATION FUNCTIONS///////////////////////////////

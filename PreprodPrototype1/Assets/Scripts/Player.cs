@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public int playerMaxHealth = 100;
+    public int playerCurrentHealth;
+
+    private void Start()
     {
-        
+        playerCurrentHealth = playerMaxHealth;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TakeDamage(int enemyDamage = 10)
     {
-        
+        playerCurrentHealth = playerCurrentHealth - enemyDamage;
+
+        if (playerCurrentHealth <= 0)
+        {
+            TurnManager.Instance.SetGameOver();
+        }
     }
 }

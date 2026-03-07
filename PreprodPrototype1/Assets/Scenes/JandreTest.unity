@@ -192,7 +192,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a94488ed3df76134e928171a1e00e424,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1309523930}
   m_SourcePrefab: {fileID: 100100000, guid: a94488ed3df76134e928171a1e00e424, type: 3}
 --- !u!4 &277909866 stripped
 Transform:
@@ -418,11 +422,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dc022089d4613443a50d973d81262a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 1309523930}
   enemyMaxHealth: 100
   enemyAttackCardDamage: 10
   enemyDefenseCardValue: 10
   enemyCurrentHealth: 0
-  enemyCurrentEnemyDefensePoints: 0
+  enemyCurrentDefense: 0
   enemyMesh: {fileID: 0}
   enemyIdle: {fileID: 0}
   enemyAttack: {fileID: 0}
@@ -538,6 +543,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1309523927 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a94488ed3df76134e928171a1e00e424,
+    type: 3}
+  m_PrefabInstance: {fileID: 277909865}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1309523930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309523927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc8cee3eaf14b944d9e87e55ce57d35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMaxHealth: 100
+  playerCurrentHealth: 0
 --- !u!1 &1317043170
 GameObject:
   m_ObjectHideFlags: 0
