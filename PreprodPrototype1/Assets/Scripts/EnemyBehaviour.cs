@@ -83,7 +83,7 @@ public class EnemyBehaviour : MonoBehaviour
             EnemyDefense();
         }
 
-        TurnManager.Instance.EndEnemyTurn();
+        //TurnManager.Instance.EndEnemyTurn();
     }
 
     private void EnemyDefense()

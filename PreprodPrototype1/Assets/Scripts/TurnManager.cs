@@ -119,7 +119,10 @@ public class TurnManager : MonoBehaviour
         Debug.Log("Enemy thinking......");
         yield return new WaitForSeconds(2.0f);
 
-        enemyBehaviour.EnemyTurn();
+        if (enemyBehaviour != null)
+            enemyBehaviour.EnemyTurn();
+        else
+            Debug.LogWarning("TurnManager: enemyBehaviour is not assigned in the Inspector.");
 
         EndEnemyTurn();
     }
