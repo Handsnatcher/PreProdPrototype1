@@ -1,20 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
+    public Player player;
 
     //enemy attributes
     GameObject[] enemies; 
-    public int maxHealth = 100;      //max health
-    public int attackDamage = 10;   //damage value when attacking
-    public int defenseValue = 10;   //how many hit points can it defend itself from
-    public enum difficulty { easy, medium, difficult }; //affects "smartness" of AI
+    public int enemyMaxHealth = 100;         //max health
+    public int enemyAttackCardDamage = 10;   //damage value when attacking
+    public int enemyDefenseCardValue = 10;   //how many hit points can it defend itself from
 
-    private int health;
-    private float timer;
-    private Coroutine enemyThinkingCoroutine;
+    public enum enemyDifficulty { easy, medium, difficult }; //affects "smartness" of AI
+
+    public int enemyCurrentHealth;
+    public int enemyCurrentDefense; //how many hit points to negate
 
     //design attributes
     [SerializeField] private Mesh enemyMesh;        //model
@@ -28,46 +30,65 @@ public class EnemyBehaviour : MonoBehaviour
 
     void Start()
     {
-        health = maxHealth;
+        enemyCurrentHealth = enemyMaxHealth;
+        UpdateHealthUI();
     }
 
-    public void EnemyStart()
-    {
-        if (health > 0)
-        {
-            enemyThinkingCoroutine = StartCoroutine(EnemyThinking());
-        }
-    }
-
-    private IEnumerator EnemyThinking()
-    {
-        Debug.Log("Enemy thinking......");
-
-        yield return new WaitForSeconds(2.0f); //how long the enemy "thinks" for
-
-        EnemyTurn();
-    }
-
-    //FOR DEBUG PURPOSES, SIMPLE ENEMY TURN
-    private void EnemyTurn()
+    //FOR PROTOTYPE PURPOSES, SIMPLE ENEMY TURN
+    public void EnemyTurn()
     {
         //random chance to attack vs defend
         if (Random.value < 0.5f)
         {
             Debug.Log("Enemy Attacked!");
+            if (player)
+            {
+                //NOTE: damage value can be changed depending on difficulty later (for now default is 10)
+                player.TakeDamage(enemyAttackCardDamage);
+
+                //show damage UI
+                TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
+            }
         }
         else
         {
             Debug.Log("Enemy Defended!");
+            EnemyDefense();
+            TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
         }
 
-        TurnManager.Instance.EndEnemyTurn();
     }
 
+    private void EnemyDefense()
+    {
+        enemyCurrentDefense = enemyCurrentDefense + enemyDefenseCardValue;
+    }
 
+    //enemy take damage
+    public void EnemyTakeDamage(int playerDamage)
+    {
+        int finalDamage = Mathf.Max(playerDamage - enemyCurrentDefense, 0);   //to make sure defense doesnt heal enemy on accident
+        enemyCurrentHealth -= finalDamage;
+        enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
 
-    //enemy defeated
+        UpdateHealthUI();
 
+        if (enemyCurrentHealth <= 0)
+        {
+            EnemyDeath();
+        }
+    }
+
+    public void EnemyDeath()
+    {
+        Debug.Log("Enemy died");
+        //TODO: check if other enemies are in scene, if none then level is won
+    }
+
+    private void UpdateHealthUI()
+    {
+        TurnManager.Instance.UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+    }
 
     ///////////////////////////////ANIMATION FUNCTIONS///////////////////////////////
 

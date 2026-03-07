@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public enum TurnState { PlayerTurn, EnemyTurn, GameOver }
 
@@ -18,18 +19,25 @@ public class TurnManager : MonoBehaviour
     public Button endTurnButton;
     public TextMeshProUGUI turnText;
     public TextMeshProUGUI manaText;
+    public TextMeshProUGUI moveText;
+    public Slider playerHealthSlider;
+    public Slider enemyHealthSlider;
 
-    [Header("Turn Text Timing")]
+    [Header("Text Timing")]
     public float fadeInDuration = 0.4f;
     public float displayDuration = 1.5f;
     public float fadeOutDuration = 0.6f;
+
+    public float moveUpDistance = 50.0f;    //for the card move text
+
+    [Header("Enemy Thinking Delay")]
+    public float enemyThinkDuration = 2f;
 
     [Header("State (Read Only)")]
     [SerializeField] private TurnState currentState;
     [SerializeField] private int currentMana;
     [SerializeField] private int turnCount;
 
-    // -- Events other systems subscribe to --
     [Header("Turn Events")]
     public UnityEvent OnPlayerTurnStart;
     public UnityEvent OnPlayerTurnEnd;
@@ -37,15 +45,19 @@ public class TurnManager : MonoBehaviour
     public UnityEvent OnEnemyTurnEnd;
 
     [Header("Mana Events")]
-    public UnityEvent<int, int> OnManaChanged;   // (current, max)
+    public UnityEvent<int, int> OnManaChanged;
 
-    // -- Public read-only accessors --
     public TurnState CurrentState => currentState;
     public int CurrentMana => currentMana;
     public int TurnCount => turnCount;
     public bool IsPlayerTurn => currentState == TurnState.PlayerTurn;
 
+    private float enemyThinkTimer = 0f;
+    private bool enemyThinking = false;
     private Coroutine turnTextCoroutine;
+
+    private Coroutine moveTextCoroutine;
+    private Vector3 moveTextStartPos;
 
     void Awake()
     {
@@ -55,14 +67,45 @@ public class TurnManager : MonoBehaviour
 
     void Start()
     {
-        if (endTurnButton != null)
-            endTurnButton.onClick.AddListener(EndPlayerTurn);
+        if (enemyBehaviour == null)
+            enemyBehaviour = FindFirstObjectByType<EnemyBehaviour>();
 
-        // Start the turn text fully transparent
+        if (endTurnButton == null)
+            endTurnButton = GameObject.Find("EndTurnButton")?.GetComponent<Button>();
+
+        if (turnText == null)
+            turnText = GameObject.Find("TurnText")?.GetComponent<TextMeshProUGUI>();
+
+        if (manaText == null)
+            manaText = GameObject.Find("ManaText")?.GetComponent<TextMeshProUGUI>();
+
+        if (moveText == null)
+        {
+            moveText = GameObject.Find("MoveText")?.GetComponent<TextMeshProUGUI>();
+        }
+        else
+        {
+            //store starting position
+            moveTextStartPos = moveText.rectTransform.localPosition;
+            SetMoveTextAlpha(0.0f);
+        }
+
+        if (playerHealthSlider == null)
+            playerHealthSlider = GameObject.Find("PlayerHealthSlider")?.GetComponent<Slider>();
+
+        if (enemyHealthSlider == null)
+            enemyHealthSlider = GameObject.Find("EnemyHealthSlider")?.GetComponent<Slider>();
+
+        if (endTurnButton != null)
+        {
+            endTurnButton.onClick.RemoveAllListeners();
+            endTurnButton.onClick.AddListener(EndPlayerTurn);
+        }
+
         if (turnText != null)
             SetTurnTextAlpha(0f);
 
-        StartPlayerTurn();
+        SetState(TurnState.PlayerTurn);
     }
 
     void OnDestroy()
@@ -71,27 +114,84 @@ public class TurnManager : MonoBehaviour
             endTurnButton.onClick.RemoveListener(EndPlayerTurn);
     }
 
-    // TURN FLOW
-
-    public void StartPlayerTurn()
+    void Update()
     {
-        if (currentState == TurnState.GameOver) return;
+        if (enemyThinking)
+        {
+            enemyThinkTimer -= Time.deltaTime;
+            if (enemyThinkTimer <= 0f)
+            {
+                enemyThinking = false;
 
+                if (enemyBehaviour != null)
+                    enemyBehaviour.EnemyTurn();
+                else
+                    Debug.LogWarning("TurnManager: enemyBehaviour is not assigned.");
+
+                SetState(TurnState.PlayerTurn);
+            }
+        }
+    }
+
+    // STATE MACHINE
+
+    void SetState(TurnState newState)
+    {
+        if (currentState == TurnState.GameOver && newState != TurnState.GameOver) return;
+
+        currentState = newState;
+
+        switch (currentState)
+        {
+            case TurnState.PlayerTurn:
+                OnEnterPlayerTurn();
+                break;
+            case TurnState.EnemyTurn:
+                OnEnterEnemyTurn();
+                break;
+            case TurnState.GameOver:
+                OnEnterGameOver();
+                break;
+        }
+    }
+
+    void OnEnterPlayerTurn()
+    {
         turnCount++;
-        currentState = TurnState.PlayerTurn;
-
-        SetEndTurnButtonActive(true);
         RefillMana();
+        SetEndTurnButtonActive(true);
         ShowTurnText("Your Turn");
         OnPlayerTurnStart?.Invoke();
 
         Debug.Log($"[Turn {turnCount}] --- PLAYER TURN ---  Mana: {currentMana}/{maxMana}");
     }
 
-    /// <summary>
-    /// Call this from your End Turn button or card system.
-    /// Also wired up automatically if you assign endTurnButton in the Inspector.
-    /// </summary>
+    void OnEnterEnemyTurn()
+    {
+        SetEndTurnButtonActive(false);
+        ShowTurnText("Enemy Turn");
+        UpdateManaText();
+        OnPlayerTurnEnd?.Invoke();
+        OnEnemyTurnStart?.Invoke();
+
+        enemyThinkTimer = enemyThinkDuration;
+        enemyThinking = true;
+
+        Debug.Log($"[Turn {turnCount}] --- ENEMY TURN --- thinking for {enemyThinkDuration}s");
+    }
+
+    void OnEnterGameOver()
+    {
+        enemyThinking = false;
+        SetEndTurnButtonActive(false);
+        ShowTurnText("Game Over");
+        UpdateManaText();
+
+        Debug.Log("TurnManager: Game Over.");
+    }
+
+    // PUBLIC INTERFACE
+
     public void EndPlayerTurn()
     {
         if (currentState != TurnState.PlayerTurn)
@@ -100,23 +200,18 @@ public class TurnManager : MonoBehaviour
             return;
         }
 
-        currentState = TurnState.EnemyTurn;
-
-        SetEndTurnButtonActive(false);
-        ShowTurnText("Enemy Turn");
-        UpdateManaText();
         OnPlayerTurnEnd?.Invoke();
-
         Debug.Log($"[Turn {turnCount}] Player turn ended.");
-        if (enemyBehaviour)
-        {
-            enemyBehaviour.EnemyStart(); //call enemy start from EnemyBehaviour
-        }
+        SetState(TurnState.EnemyTurn);
     }
 
-    /// <summary>
-    /// Called by the enemy system when all enemies have finished acting.
-    /// </summary>
+    public void NotifyEnemyTurnStarted()
+    {
+        if (currentState != TurnState.EnemyTurn) return;
+        OnEnemyTurnStart?.Invoke();
+        Debug.Log($"[Turn {turnCount}] --- ENEMY TURN ---");
+    }
+
     public void EndEnemyTurn()
     {
         if (currentState != TurnState.EnemyTurn)
@@ -126,29 +221,17 @@ public class TurnManager : MonoBehaviour
         }
 
         OnEnemyTurnEnd?.Invoke();
-
         Debug.Log($"[Turn {turnCount}] Enemy turn ended.");
-
-        StartPlayerTurn();
+        SetState(TurnState.PlayerTurn);
     }
 
-    /// <summary>
-    /// Called by the enemy system at the start of its turn sequence.
-    /// </summary>
-    public void NotifyEnemyTurnStarted()
+    public void SetGameOver()
     {
-        if (currentState != TurnState.EnemyTurn) return;
-        OnEnemyTurnStart?.Invoke();
-
-        Debug.Log($"[Turn {turnCount}] --- ENEMY TURN ---");
+        SetState(TurnState.GameOver);
     }
 
     // MANA
 
-    /// <summary>
-    /// Attempts to spend mana. Returns true if successful.
-    /// Call this from the card system before playing a card.
-    /// </summary>
     public bool TrySpendMana(int amount)
     {
         if (currentState != TurnState.PlayerTurn)
@@ -171,9 +254,6 @@ public class TurnManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// Adds mana mid-turn (e.g. from a card effect).
-    /// </summary>
     public void GainMana(int amount)
     {
         currentMana = Mathf.Clamp(currentMana + amount, 0, maxMana);
@@ -190,21 +270,6 @@ public class TurnManager : MonoBehaviour
         UpdateManaText();
     }
 
-    // GAME OVER
-
-    /// <summary>
-    /// Call this from the player or enemy system when combat ends.
-    /// </summary>
-    public void SetGameOver()
-    {
-        currentState = TurnState.GameOver;
-        SetEndTurnButtonActive(false);
-        ShowTurnText("Game Over");
-        UpdateManaText();
-
-        Debug.Log("TurnManager: Game Over.");
-    }
-
     // UI HELPERS
 
     private void SetEndTurnButtonActive(bool active)
@@ -216,24 +281,15 @@ public class TurnManager : MonoBehaviour
     private void ShowTurnText(string message)
     {
         if (turnText == null) return;
-
-        // Cancel any existing fade so texts don't overlap
-        if (turnTextCoroutine != null)
-            StopCoroutine(turnTextCoroutine);
-
+        if (turnTextCoroutine != null) StopCoroutine(turnTextCoroutine);
         turnText.text = message;
         turnTextCoroutine = StartCoroutine(FadeTurnText());
     }
 
     private IEnumerator FadeTurnText()
     {
-        // Fade in
         yield return StartCoroutine(FadeTo(1f, fadeInDuration));
-
-        // Hold
         yield return new WaitForSeconds(displayDuration);
-
-        // Fade out
         yield return StartCoroutine(FadeTo(0f, fadeOutDuration));
     }
 
@@ -245,8 +301,7 @@ public class TurnManager : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / duration);
-            SetTurnTextAlpha(alpha);
+            SetTurnTextAlpha(Mathf.Lerp(startAlpha, targetAlpha, elapsed / duration));
             yield return null;
         }
 
@@ -266,5 +321,90 @@ public class TurnManager : MonoBehaviour
             manaText.text = currentState == TurnState.PlayerTurn
                 ? $"Mana: {currentMana} / {maxMana}"
                 : "Mana: - / -";
+    }
+
+    public void UpdatePlayerHealthSlider(int playerCurrentHealth, int playerMaxHealth)
+    {
+        if (playerHealthSlider != null)
+        {
+            playerHealthSlider.maxValue = playerMaxHealth;
+            playerHealthSlider.value = playerCurrentHealth;
+        }
+    }
+
+    //NOTE: probably need to change how this is shown when there are multiple enemies...
+    public void UpdateEnemyHealthSlider(int enemyCurrentHealth, int enemyMaxHealth)
+    {
+        if (enemyHealthSlider != null)
+        {
+            enemyHealthSlider.maxValue = enemyMaxHealth;
+            enemyHealthSlider.value = enemyCurrentHealth;
+        }
+    }
+
+    public void UpdateMoveText(Color color, string text)
+    {
+        if (moveText == null) return;
+
+        if (moveTextCoroutine != null)
+        {
+            StopCoroutine(moveTextCoroutine);
+        }
+
+        moveText.text = text;
+        moveText.color = new Color(color.r, color.g, color.b, 0.0f);
+
+        moveText.rectTransform.localPosition = moveTextStartPos;
+        moveTextCoroutine = StartCoroutine(AnimateMoveText());
+    }
+
+    private void SetMoveTextAlpha(float alpha)
+    {
+        Color c = moveText.color;
+        c.a = alpha;
+        moveText.color = c;
+    }
+
+    private IEnumerator AnimateMoveText()
+    {
+        //move text to fade upwards
+        RectTransform moveRect = moveText.rectTransform;
+
+        float totalTime = fadeInDuration + displayDuration + fadeOutDuration;
+        float elapsedTime = 0.0f;
+
+        //TODO: make it look smoother when brain hurt less
+        while (elapsedTime < totalTime)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float alpha;
+
+            if(elapsedTime >= fadeInDuration)
+            {
+                alpha = Mathf.Lerp(0.0f, 1.0f, elapsedTime / fadeInDuration);
+            }
+            else if(elapsedTime < fadeInDuration + displayDuration)
+            {
+                //set fully visible
+                alpha = 1.0f;
+            }
+            else
+            {
+                float fadeTime = elapsedTime - (fadeInDuration + displayDuration);
+                alpha = Mathf.Lerp(1.0f, 0.0f, fadeTime / fadeOutDuration);
+
+            }
+
+            SetMoveTextAlpha((float)alpha);
+
+            float moveTextProgress = elapsedTime / totalTime;
+            moveRect.localPosition = moveTextStartPos + Vector3.up * (moveUpDistance * moveTextProgress);
+
+            yield return null;
+        }
+
+        //set transparent
+        SetMoveTextAlpha(0.0f);
     }
 }

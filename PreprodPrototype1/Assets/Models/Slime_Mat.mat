@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3612857297402620654
+--- !u!114 &-3014070783273300178
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,9 +20,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Lit Variant
+  m_Name: Slime_Mat
   m_Shader: {fileID: 4800000, guid: b52fe246cff8c2044bf123e08bbe18fe, type: 3}
-  m_Parent: {fileID: 2100000, guid: 294f2604f80f9bc4c895fdf15723a51c, type: 2}
+  m_Parent: {fileID: 2100000, guid: 9be7f83732eae0d4f98ba0d3b331f313, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -36,18 +36,24 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _InkTex:
+        m_Texture: {fileID: 2800000, guid: 03abe0f335dfafb47aec93d2b646e78b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 03abe0f335dfafb47aec93d2b646e78b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _InkScale: 0.1
-    - _InkStrength: 0
-    - _OutlineWidth: 0.024
-    - _RimPower: 1.3
-    - _ShadowSmooth: 0
-    - _ShadowSteps: 1
+    - _InkScale: 3
+    - _InkStrength: 0.28
+    - _OutlineWidth: 0.047
+    - _RimPower: 2.1
+    - _ShadowSmooth: 0.041
+    - _ShadowSteps: 2
     m_Colors:
-    - _Color: {r: 0, g: 0.8584906, b: 0.03032868, a: 1}
+    - _Color: {r: 0, g: 1, b: 0.17995548, a: 1}
+    - _RimColor: {r: 0.9622642, g: 0.11820598, b: 0, a: 1}
+    - _ShadowColor: {r: 0.19999996, g: 0.19999996, b: 0.29999998, a: 1}
   m_BuildTextureStacks: []
