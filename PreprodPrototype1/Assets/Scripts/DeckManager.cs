@@ -114,6 +114,40 @@ public class DeckManager : MonoBehaviour
         OnHandChanged?.Invoke();
     }
 
+    public void DiscardCard(Card cardToDiscard)
+    {
+        if (cardToDiscard == null)
+        {
+            return;
+        }
+
+        hand.Remove(cardToDiscard);
+
+        discard.Add(cardToDiscard);
+
+        ClearHandVisuals();
+
+        UpdateDeckUI();
+        OnHandChanged?.Invoke();
+    }
+
+    public void DiscardHand()
+    {
+        if (hand.Count == 0)
+        {
+            return;
+        }
+
+        discard.AddRange(hand);
+        hand.Clear();
+
+        ClearHandVisuals();
+
+        UpdateDeckUI();
+
+        OnHandChanged?.Invoke();
+    }
+
     public bool PlayCard(Card card)
     {
         if (card == null || !hand.Contains(card))
@@ -144,17 +178,6 @@ public class DeckManager : MonoBehaviour
 
         UpdateDeckUI();
         OnHandChanged?.Invoke();
-
-        //foreach (Transform child in handParent)
-        //{
-        //    var ui = child.GetComponent<CardUI>();
-        //
-        //    if (ui != null && ui.cardData == card)
-        //    {
-        //        ui.StartCoroutine(ui.PlayCardAnimation());
-        //        break;
-        //    }
-        //}
 
         return true;
     }
