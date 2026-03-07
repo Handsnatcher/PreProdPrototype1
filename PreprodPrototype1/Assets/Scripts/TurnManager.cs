@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public enum TurnState { PlayerTurn, EnemyTurn, GameOver }
 
@@ -18,11 +19,16 @@ public class TurnManager : MonoBehaviour
     public Button endTurnButton;
     public TextMeshProUGUI turnText;
     public TextMeshProUGUI manaText;
+    public TextMeshProUGUI moveText;
+    public Slider playerHealthSlider;
+    public Slider enemyHealthSlider;
 
-    [Header("Turn Text Timing")]
+    [Header("Text Timing")]
     public float fadeInDuration = 0.4f;
     public float displayDuration = 1.5f;
     public float fadeOutDuration = 0.6f;
+
+    public float moveUpDistance = 50.0f;    //for the card move text
 
     [Header("Enemy Thinking Delay")]
     public float enemyThinkDuration = 2f;
@@ -50,6 +56,9 @@ public class TurnManager : MonoBehaviour
     private bool enemyThinking = false;
     private Coroutine turnTextCoroutine;
 
+    private Coroutine moveTextCoroutine;
+    private Vector3 moveTextStartPos;
+
     void Awake()
     {
         if (Instance == null) Instance = this;
@@ -69,6 +78,23 @@ public class TurnManager : MonoBehaviour
 
         if (manaText == null)
             manaText = GameObject.Find("ManaText")?.GetComponent<TextMeshProUGUI>();
+
+        if (moveText == null)
+        {
+            moveText = GameObject.Find("MoveText")?.GetComponent<TextMeshProUGUI>();
+        }
+        else
+        {
+            //store starting position
+            moveTextStartPos = moveText.rectTransform.localPosition;
+            SetMoveTextAlpha(0.0f);
+        }
+
+        if (playerHealthSlider == null)
+            playerHealthSlider = GameObject.Find("PlayerHealthSlider")?.GetComponent<Slider>();
+
+        if (enemyHealthSlider == null)
+            enemyHealthSlider = GameObject.Find("EnemyHealthSlider")?.GetComponent<Slider>();
 
         if (endTurnButton != null)
         {
@@ -295,5 +321,90 @@ public class TurnManager : MonoBehaviour
             manaText.text = currentState == TurnState.PlayerTurn
                 ? $"Mana: {currentMana} / {maxMana}"
                 : "Mana: - / -";
+    }
+
+    public void UpdatePlayerHealthSlider(int playerCurrentHealth, int playerMaxHealth)
+    {
+        if (playerHealthSlider != null)
+        {
+            playerHealthSlider.maxValue = playerMaxHealth;
+            playerHealthSlider.value = playerCurrentHealth;
+        }
+    }
+
+    //NOTE: probably need to change how this is shown when there are multiple enemies...
+    public void UpdateEnemyHealthSlider(int enemyCurrentHealth, int enemyMaxHealth)
+    {
+        if (enemyHealthSlider != null)
+        {
+            enemyHealthSlider.maxValue = enemyMaxHealth;
+            enemyHealthSlider.value = enemyCurrentHealth;
+        }
+    }
+
+    public void UpdateMoveText(Color color, string text)
+    {
+        if (moveText == null) return;
+
+        if (moveTextCoroutine != null)
+        {
+            StopCoroutine(moveTextCoroutine);
+        }
+
+        moveText.text = text;
+        moveText.color = new Color(color.r, color.g, color.b, 0.0f);
+
+        moveText.rectTransform.localPosition = moveTextStartPos;
+        moveTextCoroutine = StartCoroutine(AnimateMoveText());
+    }
+
+    private void SetMoveTextAlpha(float alpha)
+    {
+        Color c = moveText.color;
+        c.a = alpha;
+        moveText.color = c;
+    }
+
+    private IEnumerator AnimateMoveText()
+    {
+        //move text to fade upwards
+        RectTransform moveRect = moveText.rectTransform;
+
+        float totalTime = fadeInDuration + displayDuration + fadeOutDuration;
+        float elapsedTime = 0.0f;
+
+        //TODO: make it look smoother when brain hurt less
+        while (elapsedTime < totalTime)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float alpha;
+
+            if(elapsedTime >= fadeInDuration)
+            {
+                alpha = Mathf.Lerp(0.0f, 1.0f, elapsedTime / fadeInDuration);
+            }
+            else if(elapsedTime < fadeInDuration + displayDuration)
+            {
+                //set fully visible
+                alpha = 1.0f;
+            }
+            else
+            {
+                float fadeTime = elapsedTime - (fadeInDuration + displayDuration);
+                alpha = Mathf.Lerp(1.0f, 0.0f, fadeTime / fadeOutDuration);
+
+            }
+
+            SetMoveTextAlpha((float)alpha);
+
+            float moveTextProgress = elapsedTime / totalTime;
+            moveRect.localPosition = moveTextStartPos + Vector3.up * (moveUpDistance * moveTextProgress);
+
+            yield return null;
+        }
+
+        //set transparent
+        SetMoveTextAlpha(0.0f);
     }
 }

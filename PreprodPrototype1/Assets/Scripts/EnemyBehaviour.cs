@@ -18,8 +18,6 @@ public class EnemyBehaviour : MonoBehaviour
     public int enemyCurrentHealth;
     public int enemyCurrentDefense; //how many hit points to negate
 
-    //private Coroutine enemyThinkingCoroutine = null;
-
     //design attributes
     [SerializeField] private Mesh enemyMesh;        //model
     [SerializeField] private Animation enemyIdle;   //idle animation
@@ -33,36 +31,10 @@ public class EnemyBehaviour : MonoBehaviour
     void Start()
     {
         enemyCurrentHealth = enemyMaxHealth;
+        UpdateHealthUI();
     }
 
-    //public void EnemyStart()
-    //{
-    //    Debug.Log("EnemyStart called");
-
-    //    if (enemyThinkingCoroutine == null)
-    //    {
-    //        if (enemyCurrentHealth > 0)
-    //        {
-    //            TurnManager.Instance.NotifyEnemyTurnStarted();
-    //            enemyThinkingCoroutine = StartCoroutine(EnemyThinking());
-    //        }
-    //    }
-
-    //}
-
-    //private IEnumerator EnemyThinking()
-    //{
-    //    Debug.Log("Enemy thinking......");
-
-    //    yield return new WaitForSeconds(2.0f); //how long the enemy "thinks" for
-
-    //    EnemyTurn();
-
-    //    enemyThinkingCoroutine = null;
-
-    //}
-
-    //FOR DEBUG PURPOSES, SIMPLE ENEMY TURN
+    //FOR PROTOTYPE PURPOSES, SIMPLE ENEMY TURN
     public void EnemyTurn()
     {
         //random chance to attack vs defend
@@ -72,18 +44,19 @@ public class EnemyBehaviour : MonoBehaviour
             if (player)
             {
                 //NOTE: damage value can be changed depending on difficulty later (for now default is 10)
-                player.TakeDamage();
+                player.TakeDamage(enemyAttackCardDamage);
 
                 //show damage UI
+                TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
             }
         }
         else
         {
             Debug.Log("Enemy Defended!");
             EnemyDefense();
+            TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
         }
 
-        //TurnManager.Instance.EndEnemyTurn();
     }
 
     private void EnemyDefense()
@@ -91,14 +64,31 @@ public class EnemyBehaviour : MonoBehaviour
         enemyCurrentDefense = enemyCurrentDefense + enemyDefenseCardValue;
     }
 
-
-    //enemy take damage (CALL WHEN PLAY CARD)
-    public void EnemyTakeDamage(int damage)
+    //enemy take damage
+    public void EnemyTakeDamage(int playerDamage)
     {
-        int finalDamage = Mathf.Max(damage - enemyCurrentDefense, 0);   //to make sure defense doesnt heal enemy on accident
+        int finalDamage = Mathf.Max(playerDamage - enemyCurrentDefense, 0);   //to make sure defense doesnt heal enemy on accident
         enemyCurrentHealth -= finalDamage;
+        enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
+
+        UpdateHealthUI();
+
+        if (enemyCurrentHealth <= 0)
+        {
+            EnemyDeath();
+        }
     }
 
+    public void EnemyDeath()
+    {
+        Debug.Log("Enemy died");
+        //TODO: check if other enemies are in scene, if none then level is won
+    }
+
+    private void UpdateHealthUI()
+    {
+        TurnManager.Instance.UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+    }
 
     ///////////////////////////////ANIMATION FUNCTIONS///////////////////////////////
 
