@@ -18,7 +18,7 @@ public class EnemyBehaviour : MonoBehaviour
     public int enemyCurrentHealth;
     public int enemyCurrentDefense; //how many hit points to negate
 
-    private Coroutine enemyThinkingCoroutine = null;
+    //private Coroutine enemyThinkingCoroutine = null;
 
     //design attributes
     [SerializeField] private Mesh enemyMesh;        //model
