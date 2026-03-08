@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using TreeEditor;
 using UnityEngine;
 using UnityEngine.UI;
+
+//TreeEditor is editor only comment out before builds
+//using TreeEditor;
 
 public class MapManager : MonoBehaviour
 {
