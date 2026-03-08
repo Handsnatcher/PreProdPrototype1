@@ -105,6 +105,16 @@ public class TurnManager : MonoBehaviour
         if (turnText != null)
             SetTurnTextAlpha(0f);
 
+        // DeckManager Initialize for Combat start
+        if (DeckManager.Instance != null)
+        {
+            DeckManager.Instance.InitializeForNewCombat();
+        }
+        else
+        {
+            Debug.Log("DeckManager not found.");
+        }
+
         SetState(TurnState.PlayerTurn);
     }
 

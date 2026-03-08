@@ -618,7 +618,8 @@ MonoBehaviour:
     type: 3}
   deckCountText: {fileID: 0}
   discardCountText: {fileID: 0}
-  cardsToDrawPerTurn: 4
+  cardsToDrawPerTurn: 5
+  player: {fileID: 1309523930}
   deck: []
   hand: []
   discard: []

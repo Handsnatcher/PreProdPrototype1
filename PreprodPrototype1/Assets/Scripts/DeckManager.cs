@@ -7,6 +7,8 @@ using Unity.VisualScripting;
 
 public class DeckManager : MonoBehaviour
 {
+    public static DeckManager Instance { get; private set; }
+
     [Header("UI References")]
     public Transform handParent;                // UI panel with horizontal layout group
     public GameObject cardUIPrefab;             // Prefab with card ui, image and button
@@ -14,13 +16,27 @@ public class DeckManager : MonoBehaviour
     public TextMeshProUGUI discardCountText;    // Shows amount of cards in discard
 
     [Header("Drawing")]
-    public int cardsToDrawPerTurn = 4;
+    public int cardsToDrawPerTurn = 5;
+
+    [Header("Player")]
+    [SerializeField] private Player player;
 
     public List<Card> deck      = new List<Card>();  
     public List<Card> hand      = new List<Card>();
     public List<Card> discard   = new List<Card>();
 
     public UnityEvent OnHandChanged;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void OnEnable()
     {
@@ -160,15 +176,23 @@ public class DeckManager : MonoBehaviour
             return false;
         }
 
-        // Apply effect
+        // Apply card effects
         switch (card.type)
         {
             case Card.CardType.Attack:
-                //TODO: Damage enemy
+                if (player != null)
+                {
+                    player.playerAttackCardDamage = card.effectValue;
+                    player.PlayerAttack();
+                }
                 break;
 
             case Card.CardType.Defend:
-                //TODO: Player armor up
+                if (player!= null)
+                {
+                    player.playerDefenseCardValue = card.effectValue;
+                    player.PlayerDefense();
+                }
                 break;
         }
 
@@ -222,8 +246,10 @@ public class DeckManager : MonoBehaviour
         {
             TurnManager.Instance.OnManaChanged.AddListener(OnManaChanged);
         }
-        InitializeForNewCombat();
-        DrawCards(5);
+
+        // This was for testing, pls ignore
+        //InitializeForNewCombat();
+        //DrawCards(5);
     }
 
     private void OnDestroy()
