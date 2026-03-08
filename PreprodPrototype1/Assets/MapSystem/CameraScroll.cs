@@ -18,7 +18,7 @@ public class CameraScroll : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0)
         {
-            transform.position += Vector3.up * scroll * 50.0f;
+            transform.position += Vector3.up * scroll * 200.0f;
         }
     }
 }
