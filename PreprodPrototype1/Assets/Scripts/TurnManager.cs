@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 using System;
 
 public enum TurnState { PlayerTurn, EnemyTurn, GameOver }
@@ -46,6 +47,9 @@ public class TurnManager : MonoBehaviour
 
     [Header("Mana Events")]
     public UnityEvent<int, int> OnManaChanged;
+
+    [Header("Scenes")]
+    public string deathSceneName = "DeathScene";
 
     public TurnState CurrentState => currentState;
     public int CurrentMana => currentMana;
@@ -198,6 +202,14 @@ public class TurnManager : MonoBehaviour
         UpdateManaText();
 
         Debug.Log("TurnManager: Game Over.");
+        StartCoroutine(LoadDeathScene());
+    }
+
+    private IEnumerator LoadDeathScene()
+    {
+        // Wait for the Game Over text to finish fading in before switching
+        yield return new WaitForSeconds(fadeInDuration + displayDuration);
+        SceneManager.LoadScene(deathSceneName);
     }
 
     // PUBLIC INTERFACE
@@ -208,6 +220,15 @@ public class TurnManager : MonoBehaviour
         {
             Debug.LogWarning("TurnManager: Tried to end player turn outside of PlayerTurn state.");
             return;
+        }
+        // DeckManager Initialize for Combat start
+        if (DeckManager.Instance != null)
+        {
+            DeckManager.Instance.DiscardHand();
+        }
+        else
+        {
+            Debug.Log("DeckManager not found.");
         }
 
         OnPlayerTurnEnd?.Invoke();

@@ -410,6 +410,7 @@ MonoBehaviour:
   OnManaChanged:
     m_PersistentCalls:
       m_Calls: []
+  deathSceneName: Death
 --- !u!4 &415972449
 Transform:
   m_ObjectHideFlags: 0
@@ -884,7 +885,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -211.02, y: -26.6}
+  m_AnchoredPosition: {x: -211.02002, y: -26.599976}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &926097094
@@ -972,7 +973,7 @@ MonoBehaviour:
     type: 3}
   deckCountText: {fileID: 0}
   discardCountText: {fileID: 0}
-  cardsToDrawPerTurn: 4
+  cardsToDrawPerTurn: 5
   player: {fileID: 1309523930}
   deck: []
   hand: []
@@ -1969,7 +1970,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 172.68, y: -26.6}
+  m_AnchoredPosition: {x: 172.67993, y: -26.599976}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1650660930
