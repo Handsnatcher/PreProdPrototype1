@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -16,6 +15,8 @@ public class Player : MonoBehaviour
     [Header("Debug")]
     public bool debugKey = true;
 
+    private DynamicCameraSystem cameraSystem;
+
     private void Start()
     {
         //set player health
@@ -29,6 +30,10 @@ public class Player : MonoBehaviour
             PlayerPrefs.SetInt(PLAYER_HEALTH_KEY, playerCurrentHealth);
         }
 
+        cameraSystem = Camera.main.GetComponent<DynamicCameraSystem>();
+        if (cameraSystem == null)
+            Debug.LogWarning("Player: No DynamicCameraSystem found on Main Camera.");
+
         UpdateHealthUI();
     }
 
@@ -39,6 +44,12 @@ public class Player : MonoBehaviour
         {
             Heal(10);
         }
+
+        if (debugKey && Input.GetKeyDown(KeyCode.T))
+            cameraSystem?.EnterTargetingMode();
+
+        if (debugKey && Input.GetKeyUp(KeyCode.T))
+            cameraSystem?.ExitTargetingMode();
     }
 
     public void TakeDamage(int enemyDamage = 10)
@@ -68,21 +79,40 @@ public class Player : MonoBehaviour
     [System.Obsolete]
     public void PlayerAttack()
     {
-        //TODO: select enemy, for now just find random enemy and attack them
-        EnemyBehaviour[] enemies = FindObjectsOfType<EnemyBehaviour>();
+        EnemyBehaviour[] enemies = FindObjectsByType<EnemyBehaviour>(FindObjectsSortMode.None);
 
-        if (enemies.Length > 0)
+        if (enemies.Length == 0)
         {
-            EnemyBehaviour target = enemies[Random.Range(0, enemies.Length)];
+            Debug.LogWarning("Player: No enemies found to attack.");
+            return;
+        }
 
-            //make sure enemy isnt dead
-            if (target.enemyCurrentHealth > 0)
+        // Enter targeting mode so player can pick a target
+        cameraSystem?.EnterTargetingMode();
+
+        // For now pick a random living enemy - swap this out when card targeting UI is ready
+        EnemyBehaviour target = null;
+        foreach (var e in enemies)
+        {
+            if (e.enemyCurrentHealth > 0)
             {
-                TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
-                target.EnemyTakeDamage(playerAttackCardDamage);
+                target = e;
+                break;
             }
         }
 
+        if (target == null)
+        {
+            Debug.LogWarning("Player: All enemies are dead.");
+            cameraSystem?.ExitTargetingMode();
+            return;
+        }
+
+        TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
+        target.EnemyTakeDamage(playerAttackCardDamage);
+
+        // Return camera to dynamic shots after attack resolves
+        cameraSystem?.ExitTargetingMode();
     }
 
     private void UpdateHealthUI()
