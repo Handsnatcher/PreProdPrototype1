@@ -19,6 +19,12 @@ public class MainMenuScript : MonoBehaviour
 
     public void StartGame()
     {
+        PlayerPrefs.SetInt("MapLevel", 0);
+        SceneManager.LoadScene("MapScene");
+    }
+
+    public void ContinueGame()
+    {
         SceneManager.LoadScene("MapScene");
     }
 }

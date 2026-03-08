@@ -1,44 +1,104 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-//TreeEditor is editor only comment out before builds
-//using TreeEditor;
+[System.Serializable]
+public class MapSaveData
+{
+    public List<NodeSaveData> savedNodes = new List<NodeSaveData>();
+}
 
 public class MapManager : MonoBehaviour
 {
     public GameObject nodeObject;
     public GameObject lineObject;
     public Transform canvasTransform;
+    public Transform linesTransform;
+    public Transform nodesTransform;
     public Dictionary<Vector2Int, Node> nodes = new Dictionary<Vector2Int, Node>();
-    public List<LineRenderer> lines;
-    private int gridHeight = 7;
-    private int gridWidth = 10;
+    //public List<LineRenderer> lines;
+    public List<UILine> lines;
+    private int gridHeight = 15;
+    private int gridWidth = 8;
+    private string savePath => Path.Combine(Application.persistentDataPath, "MapData.json");
 
     // Start is called before the first frame update
     void Start()
+    {
+        // create node and add them to the grid
+        //for (int i = 0; i < gridHeight; i++)
+        //{
+        //    for (int j = 0; j < gridWidth; j++)
+        //    {
+        //        Node node = Instantiate(nodeObject, canvasTransform).GetComponent<Node>();
+        //        node.transform.localPosition = new Vector3((j - (gridWidth - 1) / 2)*100, (i - gridHeight / 2) * 100, 0);
+        //        node.id = i * gridWidth + j;
+        //        node.coord = new Vector2Int(j, i);
+        //        node.nodeType = (NodeType)Random.Range(0, 3);
+        //        node.nodeLevel = i + 1;
+        //        node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString(); // node text(TODO: replace with image)
+                
+        //        nodes[new Vector2Int(j,i)] = node;
+        //    }
+        //}
+        if (PlayerPrefs.GetInt("MapLevel") == 0) // new game
+        {
+            PlayerPrefs.SetInt("MapLevel", 1); // start first level
+            CreateMap();
+
+            Camera cam = Camera.main;
+            cam.transform.position = new Vector3(0, 1, -10);
+        }
+        else // continue
+        {
+            LoadMap();
+
+            float camX = PlayerPrefs.GetFloat("CamX");
+            float camY = PlayerPrefs.GetFloat("CamY");
+            float camZ = PlayerPrefs.GetFloat("CamZ");
+
+            Camera cam = Camera.main;
+            cam.transform.position = new Vector3(camX, camY, camZ);
+        }
+
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+    }
+
+    void CreateMap()
     {
         // create node and add them to the grid
         for (int i = 0; i < gridHeight; i++)
         {
             for (int j = 0; j < gridWidth; j++)
             {
-                Node node = Instantiate(nodeObject, canvasTransform).GetComponent<Node>();
-                node.transform.localPosition = new Vector3((j - (gridWidth - 1) / 2)*100, (i - gridHeight / 2) * 100, 0);
-
+                Node node = Instantiate(nodeObject, nodesTransform).GetComponent<Node>();
+                node.transform.localPosition = new Vector3((j - (gridWidth - 1) / 2) * 100, (i) * 100, 0);
+                node.id = i * gridWidth + j;
                 node.coord = new Vector2Int(j, i);
                 node.nodeType = (NodeType)Random.Range(0, 3);
-                node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString();
-                
-                nodes[new Vector2Int(j,i)] = node;
+                node.nodeLevel = i + 1;
+                node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString(); // node text(TODO: replace with image)
+
+                nodes[new Vector2Int(j, i)] = node;
             }
         }
 
         // boss node
         Node bossNode = Instantiate(nodeObject, canvasTransform).GetComponent<Node>();
-        bossNode.transform.localPosition = new Vector3(0, (gridHeight / 2 + 1) * 100, 0);
+        bossNode.id = gridHeight * gridWidth;
+        bossNode.coord = new Vector2Int(0, gridHeight);
+        bossNode.nodeType = NodeType.BOSS;
+        bossNode.nodeLevel = gridHeight;
+        nodes[new Vector2Int(0, gridHeight)] = bossNode;
+        bossNode.transform.localPosition = new Vector3(0, (gridHeight + 1) * 100, 0);
 
         bossNode.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = bossNode.nodeType.ToString()[0].ToString();
 
@@ -50,10 +110,29 @@ public class MapManager : MonoBehaviour
             foreach (KeyValuePair<Vector2Int, Node> p in nodes)
             {
                 int nextRow = p.Key.y + 1;
+                // check if the level is unlocked
+                //if (p.Value.nodeLevel > PlayerPrefs.GetInt("MapLevel"))
+                //{
+                //    p.Value.DeactivateButton();
+                //}
+                //else if (p.Value.nodeLevel < PlayerPrefs.GetInt("MapLevel"))
+                //{
+                //    if (p.Value.isActivated)
+                //    {
+                //        p.Value.MarkPastButton();
+                //    }
+                //}
+                //else
+                //{
+                //    p.Value.isUnlocked = true;
+                //    p.Value.ActivateButton();
+                //}
 
                 if (p.Key.y == 0) // first row
                 {
                     p.Value.connectedNodes.Clear(); // reset
+                    p.Value.isUnlocked = true; // unlock first row
+                    p.Value.ActivateButton();
 
                     if (p.Key.x == 0) // first node in the row
                     {
@@ -69,7 +148,7 @@ public class MapManager : MonoBehaviour
                             // connect self to node
                             n1.connectedNodes.Add(p.Value);
                             n2.connectedNodes.Add(p.Value);
-                            firstRowConnectionCount ++;
+                            firstRowConnectionCount++;
                         }
                         else if (connectionSize == 1) // connect random 1 node
                         {
@@ -141,7 +220,7 @@ public class MapManager : MonoBehaviour
                         if (firstRowConnectionCount < (gridWidth / 2))
                         {
                             firstRowConnectionCount = 0; // reset count
-                            foreach(LineRenderer l in lines)
+                            foreach (UILine l in lines)
                             {
                                 Destroy(l);
                             }
@@ -184,9 +263,9 @@ public class MapManager : MonoBehaviour
                             n3.connectedNodes.Add(p.Value);
                             firstRowConnectionCount++;
                         }
-                        else if (connectionSize == 2) 
+                        else if (connectionSize == 2)
                         {
-                            if(connectionSize == possibleConnectionCount)// connect to both nodes above and on the right
+                            if (connectionSize == possibleConnectionCount)// connect to both nodes above and on the right
                             {
                                 // set to be connected node
                                 Node n1 = nodes[new Vector2Int(p.Key.x, nextRow)];
@@ -242,7 +321,7 @@ public class MapManager : MonoBehaviour
                                         break;
                                 }
                             }
-                            firstRowConnectionCount ++;
+                            firstRowConnectionCount++;
                         }
                         else if (connectionSize == 1) // connect random 1 node
                         {
@@ -452,27 +531,180 @@ public class MapManager : MonoBehaviour
                 }
 
                 // create line render
-                if (p.Value.connectedNodes.Count > 0)
+                //if (p.Value.connectedNodes.Count > 0)
+                //{
+                //    foreach (Node n in p.Value.connectedNodes)
+                //    {
+                //        LineRenderer line = Instantiate(lineObject, canvasTransform).GetComponent<LineRenderer>();
+                //        line.positionCount = 2;
+                //        line.SetPosition(0, n.transform.position);
+                //        line.SetPosition(1, p.Value.transform.position);
+                //        lines.Add(line);
+                //    }
+                //}
+                //else
+                //{
+                //    Destroy(nodes[p.Key].gameObject);
+                //}
+                DrawMapPath(p.Value);
+            }
+        }
+
+        SaveMap();
+    }
+
+    void DrawMapPath(Node n)
+    {
+        if (n.connectedNodes.Count > 0 || n.nodeType == NodeType.BOSS)
+        {
+            //foreach (Node node in n.connectedNodes)
+            //{
+            //    LineRenderer line = Instantiate(lineObject, canvasTransform).GetComponent<LineRenderer>();
+            //    line.positionCount = 2;
+            //    line.SetPosition(0, node.transform.position);
+            //    line.SetPosition(1, n.transform.position);
+            //    lines.Add(line);
+            //}
+
+            foreach (Node node in n.connectedNodes)
+            {
+                UILine line = Instantiate(lineObject, linesTransform).GetComponent<UILine>();
+                line.pointA = node.GetComponentInChildren<Button>().GetComponent<RectTransform>();
+                line.pointB = n.GetComponentInChildren<Button>().GetComponent<RectTransform>();
+
+                lines.Add(line);
+            }
+        }
+        else
+        {
+            Destroy(nodes[n.coord].gameObject);
+        }
+
+        // activate button
+        if (n.nodeLevel > PlayerPrefs.GetInt("MapLevel")) // future route
+        {
+            n.DeactivateButton();
+        }
+        else if (n.nodeLevel < PlayerPrefs.GetInt("MapLevel")) // past route
+        {
+            if (n.isActivated)
+            {
+                n.MarkPastButton();
+            }
+            else
+            {
+                n.DeactivateButton();
+            }
+            n.isUnlocked = false;
+        }
+        else // current route
+        {
+            //n.isUnlocked = true;
+            
+            // only unlock node who has prevous node unlocked
+            foreach (var node in n.connectedNodes)
+            {
+                if (node.isActivated)
                 {
-                    foreach (Node n in p.Value.connectedNodes)
-                    {
-                        LineRenderer line = Instantiate(lineObject,canvasTransform).GetComponent<LineRenderer>();
-                        line.positionCount = 2;
-                        line.SetPosition(0, n.transform.position);
-                        line.SetPosition(1, p.Value.transform.position);
-                        lines.Add(line);
-                    }
+                    n.isUnlocked = true;
                 }
-                else
-                {
-                    Destroy(nodes[p.Key].gameObject);
-                }
+            }
+            // activate button
+            if (n.isUnlocked)
+            {
+                n.ActivateButton();
+            }
+            else
+            {
+                n.DeactivateButton();
             }
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SaveMap()
     {
+        MapSaveData mapData = new MapSaveData();
+
+        // loop through nodes and add to save data
+        foreach (var p in nodes)
+        {
+            NodeSaveData nodeData = new NodeSaveData();
+            nodeData.id = p.Value.id;
+            nodeData.nodeType = p.Value.nodeType;
+            nodeData.isUnlocked = p.Value.isUnlocked;
+            nodeData.nodeLevel = p.Value.nodeLevel;
+            nodeData.isActivated = p.Value.isActivated;
+            nodeData.coord = p.Value.coord;
+
+            foreach (var n in p.Value.connectedNodes)
+            {
+                nodeData.connectedNode.Add(n.id);
+            }
+
+            mapData.savedNodes.Add(nodeData);
+        }
+
+        // save to file
+        string json = JsonUtility.ToJson(mapData);
+        File.WriteAllText(savePath, json);
+    }
+
+    public void LoadMap()
+    {
+        if (!File.Exists(savePath))
+        {
+            return;
+        }
+
+        string json = File.ReadAllText(savePath);
+        MapSaveData mapData = JsonUtility.FromJson<MapSaveData>(json);
+
+        nodes.Clear();
+
+        Dictionary<int, Node> indexedNodes = new Dictionary<int, Node>();
+
+        // create node
+        foreach (var nodeData in mapData.savedNodes)
+        {
+            Node node = Instantiate(nodeObject, nodesTransform).GetComponent<Node>();
+
+            node.id = nodeData.id;
+            node.coord = nodeData.coord;
+            node.isActivated = nodeData.isActivated;
+            node.isUnlocked = nodeData.isUnlocked;
+            node.nodeLevel = nodeData.nodeLevel;
+            node.nodeType = nodeData.nodeType;
+            node.connectedNodes = new List<Node>();
+
+            if (node.nodeType == NodeType.BOSS)
+            {
+                node.transform.localPosition = new Vector3(0, (gridHeight + 1) * 100, 0);
+            }
+            else
+            {
+                node.transform.localPosition = new Vector3((node.coord.x - (gridWidth - 1) / 2) * 100, (node.coord.y) * 100, 0);
+            }
+
+            node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString();
+
+            nodes[node.coord] = node;
+            indexedNodes[node.id] = node;
+        }
+
+        // reconnect nodes
+        foreach (var nodeData in mapData.savedNodes)
+        {
+            Node node = indexedNodes[nodeData.id];
+
+            foreach (var id in nodeData.connectedNode)
+            {
+                if (indexedNodes.TryGetValue(id, out Node connectedNode))
+                {
+                    node.connectedNodes.Add(connectedNode);
+                }
+            }
+
+            DrawMapPath(node);
+        }
     }
 }
