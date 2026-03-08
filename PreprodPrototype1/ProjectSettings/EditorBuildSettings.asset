@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/JandreTest.unity
     guid: d092b7dbc027ddb428bbf32778089418
+  - enabled: 1
+    path: Assets/Scenes/StoryScenes/00_StoryScene.unity
+    guid: 1670682c3dc5f174c85be45acd529245
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

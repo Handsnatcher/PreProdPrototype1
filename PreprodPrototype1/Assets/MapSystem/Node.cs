@@ -76,7 +76,7 @@ public class Node : MonoBehaviour
                 SceneManager.LoadScene("JandreTest");
                 break;
             case NodeType.REST:
-                SceneManager.LoadScene("MapScene"); // for debug purpose
+                SceneManager.LoadScene("00_StoryScene"); // for debug purpose
                 break;
             case NodeType.SHOP:
                 SceneManager.LoadScene("MapScene"); // for debug purpose
