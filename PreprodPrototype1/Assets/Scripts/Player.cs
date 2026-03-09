@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     public int playerMaxHealth = 100;
     public int playerCurrentHealth;
     public int playerCurrentDefense; //how many hit points to negate
-    public int playerAttackCardDamage = 10;   //damage value when attacking
+    public int playerAttackCardDamage = 30;   //damage value when attacking
     public int playerDefenseCardValue = 10;   //how many hit points can it defend itself from
 
     private const string PLAYER_HEALTH_KEY = "PlayerHealth";    //for player prefs

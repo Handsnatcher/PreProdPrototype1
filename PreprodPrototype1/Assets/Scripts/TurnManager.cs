@@ -31,8 +31,9 @@ public class TurnManager : MonoBehaviour
 
     public float moveUpDistance = 50.0f;    //for the card move text
 
-    [Header("Enemy Thinking Delay")]
+    [Header("Enemies")]
     public float enemyThinkDuration = 2f;
+    public EnemyBehaviour[] enemies;
 
     [Header("State (Read Only)")]
     [SerializeField] private TurnState currentState;
@@ -431,16 +432,6 @@ public class TurnManager : MonoBehaviour
         {
             playerHealthSlider.maxValue = playerMaxHealth;
             playerHealthSlider.value = playerCurrentHealth;
-        }
-    }
-
-    //NOTE: probably need to change how this is shown when there are multiple enemies...
-    public void UpdateEnemyHealthSlider(int enemyCurrentHealth, int enemyMaxHealth)
-    {
-        if (enemyHealthSlider != null)
-        {
-            enemyHealthSlider.maxValue = enemyMaxHealth;
-            enemyHealthSlider.value = enemyCurrentHealth;
         }
     }
 

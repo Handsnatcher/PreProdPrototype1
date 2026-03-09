@@ -1,23 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class EnemyBehaviour : MonoBehaviour
 {
     public Player player;
 
-    //enemy attributes
-    GameObject[] enemies; 
-    public int enemyMaxHealth = 100;         //max health
-    public int enemyAttackCardDamage = 10;   //damage value when attacking
-    public int enemyDefenseCardValue = 10;   //how many hit points can it defend itself from
+    [Header("Attributes")]
+    public int enemyMaxHealth = 60;         //max health
+    public int enemyAttackCardDamage = 30;   //damage value when attacking
+    public int enemyDefenseCardValue = 5;   //how many hit points can it defend itself from
 
     public enum enemyDifficulty { easy, medium, difficult }; //affects "smartness" of AI
 
     public int enemyCurrentHealth;
     public int enemyCurrentDefense; //how many hit points to negate
 
+    [Header("UI")]
+    public Slider enemyHealthSlider;
+
+    [Header("Design")]
     //design attributes
     [SerializeField] private Mesh enemyMesh;        //model
     [SerializeField] private Animation enemyIdle;   //idle animation
@@ -31,14 +37,15 @@ public class EnemyBehaviour : MonoBehaviour
     void Start()
     {
         enemyCurrentHealth = enemyMaxHealth;
-        UpdateHealthUI();
+        UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
     }
+
 
     //FOR PROTOTYPE PURPOSES, SIMPLE ENEMY TURN
     public void EnemyTurn()
     {
         //random chance to attack vs defend
-        if (Random.value < 0.5f)
+        if (Random.value < 0.8f) //NOTE: changed this to have higher chance of attacking than defending
         {
             Debug.Log("Enemy Attacked!");
             if (player)
@@ -71,7 +78,7 @@ public class EnemyBehaviour : MonoBehaviour
         enemyCurrentHealth -= finalDamage;
         enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
 
-        UpdateHealthUI();
+        UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
 
         if (enemyCurrentHealth <= 0)
         {
@@ -85,9 +92,13 @@ public class EnemyBehaviour : MonoBehaviour
         //TODO: check if other enemies are in scene, if none then level is won
     }
 
-    private void UpdateHealthUI()
+    public void UpdateEnemyHealthSlider(int enemyCurrentHealth, int enemyMaxHealth)
     {
-        TurnManager.Instance.UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        if (enemyHealthSlider != null)
+        {
+            enemyHealthSlider.maxValue = enemyMaxHealth;
+            enemyHealthSlider.value = enemyCurrentHealth;
+        }
     }
 
     ///////////////////////////////ANIMATION FUNCTIONS///////////////////////////////
