@@ -198,18 +198,89 @@ public class TurnManager : MonoBehaviour
     {
         enemyThinking = false;
         SetEndTurnButtonActive(false);
-        ShowTurnText("Game Over");
         UpdateManaText();
 
         Debug.Log("TurnManager: Game Over.");
-        StartCoroutine(LoadDeathScene());
+        StartCoroutine(GameOverSequence());
     }
 
-    private IEnumerator LoadDeathScene()
+    private IEnumerator GameOverSequence()
     {
-        // Wait for the Game Over text to finish fading in before switching
-        yield return new WaitForSeconds(fadeInDuration + displayDuration);
-        SceneManager.LoadScene(deathSceneName);
+        GlassShatterEffect shatter = FindFirstObjectByType<GlassShatterEffect>();
+
+        if (shatter != null)
+        {
+            // Disable dynamic camera before anything
+            DynamicCameraSystem dynCam = FindFirstObjectByType<DynamicCameraSystem>();
+            if (dynCam != null) dynCam.enabled = false;
+
+            // Start loading in background
+            AsyncOperation load = SceneManager.LoadSceneAsync(deathSceneName);
+            load.allowSceneActivation = false;
+
+            // Trigger shatter - captures screen and spawns shards
+            shatter.TriggerShatter();
+
+            // Wait for scene to be ready and shards to start cracking
+            while (load.progress < 0.9f)
+                yield return null;
+
+            yield return new WaitForSeconds(shatter.crackDuration + 0.2f);
+
+            // Activate scene - shards are already falling
+            load.allowSceneActivation = true;
+
+            yield return null;
+            yield return null;
+
+            Camera gameOverCam = null;
+            Camera combatCam = null;
+
+            Camera[] allCams = FindObjectsByType<Camera>(FindObjectsSortMode.None);
+            foreach (Camera c in allCams)
+            {
+                if (c.gameObject.scene.name == deathSceneName)
+                    gameOverCam = c;
+                else
+                    combatCam = c;
+            }
+
+            // Match game over camera position to combat camera
+            if (gameOverCam != null && combatCam != null)
+            {
+                gameOverCam.transform.position = combatCam.transform.position;
+                gameOverCam.transform.rotation = combatCam.transform.rotation;
+
+                // Match projection so shards appear the same size
+                gameOverCam.orthographic = combatCam.orthographic;
+                gameOverCam.fieldOfView = combatCam.fieldOfView;
+                gameOverCam.nearClipPlane = combatCam.nearClipPlane;
+                gameOverCam.farClipPlane = combatCam.farClipPlane;
+            }
+
+            if (gameOverCam != null)
+            {
+                gameOverCam.clearFlags = CameraClearFlags.SolidColor;
+                gameOverCam.cullingMask = -1;
+                gameOverCam.depth = 0;
+            }
+
+            // Disable combat camera - game over camera takes over
+            if (combatCam != null)
+                combatCam.enabled = false;
+
+            // Point canvas at game over camera
+            Canvas[] allCanvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            foreach (Canvas c in allCanvases)
+            {
+                if (c.renderMode == RenderMode.ScreenSpaceCamera && gameOverCam != null)
+                    c.worldCamera = gameOverCam;
+            }
+        }
+        else
+        {
+            SceneManager.LoadScene(deathSceneName);
+        }
     }
 
     // PUBLIC INTERFACE
@@ -391,6 +462,7 @@ public class TurnManager : MonoBehaviour
 
     private void SetMoveTextAlpha(float alpha)
     {
+        if (moveText == null) return;
         Color c = moveText.color;
         c.a = alpha;
         moveText.color = c;
@@ -398,44 +470,35 @@ public class TurnManager : MonoBehaviour
 
     private IEnumerator AnimateMoveText()
     {
-        //move text to fade upwards
         RectTransform moveRect = moveText.rectTransform;
-
         float totalTime = fadeInDuration + displayDuration + fadeOutDuration;
         float elapsedTime = 0.0f;
 
-        //TODO: make it look smoother when brain hurt less
         while (elapsedTime < totalTime)
         {
+            if (moveText == null) yield break;
+
             elapsedTime += Time.deltaTime;
 
             float alpha;
-
-            if(elapsedTime >= fadeInDuration)
-            {
+            if (elapsedTime < fadeInDuration)
                 alpha = Mathf.Lerp(0.0f, 1.0f, elapsedTime / fadeInDuration);
-            }
-            else if(elapsedTime < fadeInDuration + displayDuration)
-            {
-                //set fully visible
+            else if (elapsedTime < fadeInDuration + displayDuration)
                 alpha = 1.0f;
-            }
             else
             {
                 float fadeTime = elapsedTime - (fadeInDuration + displayDuration);
                 alpha = Mathf.Lerp(1.0f, 0.0f, fadeTime / fadeOutDuration);
-
             }
 
-            SetMoveTextAlpha((float)alpha);
-
-            float moveTextProgress = elapsedTime / totalTime;
-            moveRect.localPosition = moveTextStartPos + Vector3.up * (moveUpDistance * moveTextProgress);
+            SetMoveTextAlpha(alpha);
+            moveRect.localPosition = moveTextStartPos + Vector3.up * (moveUpDistance * (elapsedTime / totalTime));
 
             yield return null;
         }
 
-        //set transparent
+        if (moveText == null) yield break;
         SetMoveTextAlpha(0.0f);
     }
+
 }

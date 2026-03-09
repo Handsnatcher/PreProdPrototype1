@@ -25,6 +25,9 @@ public class GlassShatterEffect : MonoBehaviour
     public float shardLifetime = 2f;
     public float fadeDuration = 0.5f;
 
+    [Header("Rendering")]
+    public int shardLayer = 3; // assign your Shards layer number here
+
     [Header("Camera")]
     public Camera targetCamera;
 
@@ -32,7 +35,7 @@ public class GlassShatterEffect : MonoBehaviour
     public bool debugKey = true;
 
     private List<GameObject> activeShards = new List<GameObject>();
-    private GameObject shardRoot;
+    public GameObject shardRoot;
     private Texture2D capturedScreen;
 
     void Start()
@@ -72,6 +75,12 @@ public class GlassShatterEffect : MonoBehaviour
     IEnumerator ShatterSequence()
     {
         var shards = SpawnShards();
+
+        // Keep the entire effect alive through scene transition
+        DontDestroyOnLoad(this.gameObject);
+        if (targetCamera != null)
+            DontDestroyOnLoad(targetCamera.gameObject);
+
         yield return new WaitForSeconds(crackDuration);
 
         if (edgesFirst)
@@ -149,38 +158,32 @@ public class GlassShatterEffect : MonoBehaviour
         Vector3 a = new Vector3(a2.x, a2.y, 0);
         Vector3 b = new Vector3(b2.x, b2.y, 0);
         Vector3 c = new Vector3(c2.x, c2.y, 0);
-
         Vector3 center = (a + b + c) / 3f;
         Vector3 fwd = Vector3.forward * shardDepth * 0.5f;
-
         Vector3 la = a - center;
         Vector3 lb = b - center;
         Vector3 lc = c - center;
 
-        // UV maps each vertex to its position on the screen [0,1]
-        // Since the plane covers exactly -halfW..halfW and -halfH..halfH
         Vector2 uvA = new Vector2((a2.x + halfW) / (halfW * 2f), (a2.y + halfH) / (halfH * 2f));
         Vector2 uvB = new Vector2((b2.x + halfW) / (halfW * 2f), (b2.y + halfH) / (halfH * 2f));
         Vector2 uvC = new Vector2((c2.x + halfW) / (halfW * 2f), (c2.y + halfH) / (halfH * 2f));
 
         Vector3[] verts = new Vector3[]
         {
-            la - fwd, lb - fwd, lc - fwd,
-            la + fwd, lb + fwd, lc + fwd,
+        la - fwd, lb - fwd, lc - fwd,
+        la + fwd, lb + fwd, lc + fwd,
         };
 
         int[] tris = new int[]
         {
-            0, 2, 1,  3, 4, 5,
-            0, 1, 3,  1, 4, 3,
-            1, 2, 4,  2, 5, 4,
-            2, 0, 5,  0, 3, 5
+        0, 2, 1,  3, 4, 5,
+        0, 1, 3,  1, 4, 3,
+        1, 2, 4,  2, 5, 4,
+        2, 0, 5,  0, 3, 5
         };
 
         Vector3 fn = Vector3.Cross(lb - la, lc - la).normalized;
         Vector3[] normals = new Vector3[] { -fn, -fn, -fn, fn, fn, fn };
-
-        // Both faces use same UVs so screen image appears on both sides
         Vector2[] uvs = new Vector2[] { uvA, uvB, uvC, uvA, uvB, uvC };
 
         Mesh mesh = new Mesh();
@@ -191,6 +194,7 @@ public class GlassShatterEffect : MonoBehaviour
         mesh.RecalculateBounds();
 
         GameObject go = new GameObject("Shard");
+        go.layer = shardLayer;
         go.transform.SetParent(shardRoot.transform, false);
         go.transform.localPosition = center;
 
@@ -198,15 +202,8 @@ public class GlassShatterEffect : MonoBehaviour
 
         MeshRenderer mr = go.AddComponent<MeshRenderer>();
         Material mat = new Material(glassShardMaterial);
+        mat.renderQueue = (int)RenderQueue.Geometry + 100;
 
-        mat.SetFloat("_Surface", 1f);
-        mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-        mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-        mat.SetInt("_ZWrite", 0);
-        mat.SetOverrideTag("RenderType", "Transparent");
-        mat.renderQueue = (int)RenderQueue.Transparent + 100;
-
-        // Assign the captured screen as the main texture
         if (capturedScreen != null)
             mat.mainTexture = capturedScreen;
 
@@ -235,21 +232,6 @@ public class GlassShatterEffect : MonoBehaviour
     {
         yield return new WaitForSeconds(lifetime);
         if (shard == null) yield break;
-
-        Material mat = shard.GetComponent<MeshRenderer>().material;
-        Color startColor = mat.GetColor("_Tint");
-        float elapsed = 0f;
-
-        while (elapsed < fade)
-        {
-            if (shard == null) yield break;
-            elapsed += Time.deltaTime;
-            Color col = startColor;
-            col.a = Mathf.Lerp(startColor.a, 0f, elapsed / fade);
-            mat.SetColor("_Tint", col);
-            yield return null;
-        }
-
         activeShards.Remove(shard);
         Destroy(shard);
     }

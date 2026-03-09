@@ -475,8 +475,10 @@ MonoBehaviour:
   torqueStrength: 8
   shardLifetime: 3
   fadeDuration: 0.8
+  shardLayer: 3
   targetCamera: {fileID: 1317043173}
   debugKey: 1
+  shardRoot: {fileID: 0}
 --- !u!1 &469776287
 GameObject:
   m_ObjectHideFlags: 0
