@@ -8,8 +8,8 @@ public enum NodeType
 {
     BATTLE,
     REST,
-    SHOP,
     EVENT,
+    SHOP,
     BOSS
 }
 
@@ -83,6 +83,7 @@ public class Node : MonoBehaviour
                 break; 
             case NodeType.EVENT:
                 SceneManager.LoadScene("MapScene"); // for debug purpose
+                PlayerPrefs.SetInt("HasCompanion", 1);
                 break;
             default:
                 break;

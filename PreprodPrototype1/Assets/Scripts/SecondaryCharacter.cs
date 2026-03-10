@@ -11,12 +11,13 @@ public class SecondaryCharacter : MonoBehaviour
 
     //effect
     private bool shouldShake;
-    private float shakeSpeed = 2.0f;
-    private float shakeAmount = 1.5f;
+    public float shakeSpeed = 2.0f;
+    public float shakeAmount = 1.0f;
+    float timer = 0;
 
     void Start()
     {
-        SetPlayer();
+        Setup();
     }
 
     void Update()
@@ -27,34 +28,52 @@ public class SecondaryCharacter : MonoBehaviour
         }
     }
 
-    void Regeneration()
+    public void Regeneration()
     {
-        if (player == null)
-        {
-            SetPlayer();
-        }
+        StartCoroutine(WaitFor(0.7f, HealEffect));
+    }
 
+    private void HealEffect()
+    {
+        Debug.Log("Healed");
         player.Heal(regenAmount);
         TurnManager.Instance.UpdateMoveText(Color.green, "+ " + regenAmount.ToString());
+        shouldShake = true;
     }
 
-    void SetPlayer()
+    private void Setup()
     {
         player = FindFirstObjectByType<Player>();
+        TurnManager.Instance.OnPlayerTurnStart.AddListener(Regeneration);
+        if(PlayerPrefs.GetInt("HasCompanion") == 0)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
-    void ObjShake()
+    private void ObjShake()
     {
         Vector3 pos = transform.position;
-        pos.x = Mathf.Sin(Time.time * shakeSpeed) * shakeAmount;
+        pos.x += Mathf.Sin(Time.time * shakeSpeed) * shakeAmount;
         transform.position = pos;
 
         // set a timer to stop shaking
-        float timer = Time.deltaTime;
-        while (timer < 1)
+        if (timer < 1.0f)
         {
             timer += Time.deltaTime;
         }
-        shouldShake = false;
+        else
+        {
+            shouldShake = false;
+            timer = 0;
+        }
+    }
+
+    IEnumerator WaitFor(float sec, System.Action action)
+    {
+        Debug.Log("waiting...");
+        yield return new WaitForSeconds(sec);
+        Debug.Log("start action");
+        action?.Invoke();
     }
 }

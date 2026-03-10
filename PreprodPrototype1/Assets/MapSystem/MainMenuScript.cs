@@ -20,6 +20,8 @@ public class MainMenuScript : MonoBehaviour
     public void StartGame()
     {
         PlayerPrefs.SetInt("MapLevel", 0);
+        PlayerPrefs.SetInt("PlayerHealth", 100);
+        PlayerPrefs.SetInt("HasCompanion", 0);
         SceneManager.LoadScene("MapScene");
     }
 
