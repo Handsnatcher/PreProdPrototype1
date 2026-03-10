@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
     public int playerMaxHealth = 100;
     public int playerCurrentHealth;
+    public int playerMaxDefense = 100;
     public int playerCurrentDefense; //how many hit points to negate
     public int playerAttackCardDamage = 30;   //damage value when attacking
     public int playerDefenseCardValue = 10;   //how many hit points can it defend itself from
@@ -14,6 +17,11 @@ public class Player : MonoBehaviour
 
     [Header("Debug")]
     public bool debugKey = true;
+
+    [Header("UI")]
+    public Slider playerHealthSlider;
+    public GameObject defenseSlider;
+    public Slider playerDefenseSlider;
 
     private DynamicCameraSystem cameraSystem;
 
@@ -34,7 +42,8 @@ public class Player : MonoBehaviour
         if (cameraSystem == null)
             Debug.LogWarning("Player: No DynamicCameraSystem found on Main Camera.");
 
-        UpdateHealthUI();
+        UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
+        defenseSlider.SetActive(false);
     }
 
     //DEBUGGING HEALTH
@@ -60,22 +69,39 @@ public class Player : MonoBehaviour
         playerCurrentHealth = Mathf.Clamp(playerCurrentHealth, 0, playerMaxHealth);
         PlayerPrefs.SetInt(PLAYER_HEALTH_KEY, playerCurrentHealth);
 
-        UpdateHealthUI();
+        UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
+        UpdatePlayerDefenseSlider(playerCurrentDefense, playerMaxDefense);
 
         if (playerCurrentHealth <= 0)
         {
             TurnManager.Instance.SetGameOver();
         }
+        //defense down
+        if (playerCurrentDefense <= 0)
+        {
+            defenseSlider.SetActive(false);
+        }
     }
 
-    //TODO: call when defense card is played
+    //call when defense card is played
     public void PlayerDefense()
     {
-        TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
-        playerCurrentDefense = playerCurrentDefense + playerDefenseCardValue;
+
+        playerCurrentDefense += playerDefenseCardValue; 
+        playerCurrentDefense = Mathf.Clamp(playerCurrentDefense, 0, playerMaxDefense);
+
+        TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!" + playerCurrentDefense);
+
+        if (playerCurrentDefense > 0)
+        {
+            defenseSlider.SetActive(true);
+        }
+
+        UpdatePlayerDefenseSlider(playerCurrentDefense, playerMaxDefense);
+
     }
 
-    //TODO: call when attack card is played
+    //call when attack card is played
     [System.Obsolete]
     public void PlayerAttack()
     {
@@ -115,9 +141,21 @@ public class Player : MonoBehaviour
         cameraSystem?.ExitTargetingMode();
     }
 
-    private void UpdateHealthUI()
+    public void UpdatePlayerHealthSlider(int playerCurrentHealth, int playerMaxHealth)
     {
-        TurnManager.Instance.UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
+        if (playerHealthSlider != null)
+        {
+            playerHealthSlider.maxValue = playerMaxHealth;
+            playerHealthSlider.value = playerCurrentHealth;
+        }
+    }
+    public void UpdatePlayerDefenseSlider(int playerCurrentDefense, int playerMaxDefense)
+    {
+        if (playerDefenseSlider != null)
+        {
+            playerDefenseSlider.maxValue = playerMaxDefense;
+            playerDefenseSlider.value = playerCurrentDefense;
+        }
     }
 
     public void Heal(int  healAmount)
@@ -129,7 +167,7 @@ public class Player : MonoBehaviour
 
         PlayerPrefs.SetInt(PLAYER_HEALTH_KEY, playerCurrentHealth);
 
-        UpdateHealthUI();
+        UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
     }
 
 }

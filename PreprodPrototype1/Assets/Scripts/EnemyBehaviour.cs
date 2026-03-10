@@ -12,6 +12,7 @@ public class EnemyBehaviour : MonoBehaviour
 
     [Header("Attributes")]
     public int enemyMaxHealth = 60;         //max health
+    public int enemyMaxDefense = 50;
     public int enemyAttackCardDamage = 30;   //damage value when attacking
     public int enemyDefenseCardValue = 5;   //how many hit points can it defend itself from
 
@@ -22,6 +23,8 @@ public class EnemyBehaviour : MonoBehaviour
 
     [Header("UI")]
     public Slider enemyHealthSlider;
+    public GameObject defenseSlider;
+    public Slider enemyDefenseSlider;
 
     [Header("Design")]
     //design attributes
@@ -38,6 +41,7 @@ public class EnemyBehaviour : MonoBehaviour
     {
         enemyCurrentHealth = enemyMaxHealth;
         UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        defenseSlider.SetActive(false);
     }
 
 
@@ -45,7 +49,13 @@ public class EnemyBehaviour : MonoBehaviour
     public void EnemyTurn()
     {
         //random chance to attack vs defend
-        if (Random.value < 0.8f) //NOTE: changed this to have higher chance of attacking than defending
+        if (Random.value < 0.4f && enemyCurrentDefense <= enemyMaxDefense)
+        {
+            Debug.Log("Enemy Defended!");
+            EnemyDefense();
+            TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
+        }
+        else
         {
             Debug.Log("Enemy Attacked!");
             if (player)
@@ -57,18 +67,20 @@ public class EnemyBehaviour : MonoBehaviour
                 TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
             }
         }
-        else
-        {
-            Debug.Log("Enemy Defended!");
-            EnemyDefense();
-            TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
-        }
 
     }
 
     private void EnemyDefense()
     {
-        enemyCurrentDefense = enemyCurrentDefense + enemyDefenseCardValue;
+        enemyCurrentDefense += enemyDefenseCardValue;
+        enemyCurrentDefense = Mathf.Clamp(enemyCurrentDefense, 0, enemyMaxDefense);
+
+        if (enemyCurrentDefense > 0)
+        {
+            defenseSlider.SetActive(true);
+        }
+
+        UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
     }
 
     //enemy take damage
@@ -79,10 +91,17 @@ public class EnemyBehaviour : MonoBehaviour
         enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
 
         UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
 
         if (enemyCurrentHealth <= 0)
         {
             EnemyDeath();
+        }
+
+        //defense down
+        if (enemyCurrentDefense <= 0)
+        {
+            defenseSlider.SetActive(false);
         }
     }
 
@@ -98,6 +117,15 @@ public class EnemyBehaviour : MonoBehaviour
         {
             enemyHealthSlider.maxValue = enemyMaxHealth;
             enemyHealthSlider.value = enemyCurrentHealth;
+        }
+    }
+
+    public void UpdateEnemyDefenseSlider(int enemyCurrentDefense, int enemyMaxDefense)
+    {
+        if (enemyDefenseSlider != null)
+        {
+            enemyDefenseSlider.maxValue = enemyMaxDefense;
+            enemyDefenseSlider.value = enemyCurrentDefense;
         }
     }
 

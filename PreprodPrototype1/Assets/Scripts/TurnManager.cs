@@ -21,8 +21,6 @@ public class TurnManager : MonoBehaviour
     public TextMeshProUGUI turnText;
     public TextMeshProUGUI manaText;
     public TextMeshProUGUI moveText;
-    public Slider playerHealthSlider;
-    public Slider enemyHealthSlider;
 
     [Header("Text Timing")]
     public float fadeInDuration = 0.4f;
@@ -94,12 +92,6 @@ public class TurnManager : MonoBehaviour
             moveTextStartPos = moveText.rectTransform.localPosition;
             SetMoveTextAlpha(0.0f);
         }
-
-        if (playerHealthSlider == null)
-            playerHealthSlider = GameObject.Find("PlayerHealthSlider")?.GetComponent<Slider>();
-
-        if (enemyHealthSlider == null)
-            enemyHealthSlider = GameObject.Find("EnemyHealthSlider")?.GetComponent<Slider>();
 
         if (endTurnButton != null)
         {
@@ -424,15 +416,6 @@ public class TurnManager : MonoBehaviour
             manaText.text = currentState == TurnState.PlayerTurn
                 ? $"Mana: {currentMana} / {maxMana}"
                 : "Mana: - / -";
-    }
-
-    public void UpdatePlayerHealthSlider(int playerCurrentHealth, int playerMaxHealth)
-    {
-        if (playerHealthSlider != null)
-        {
-            playerHealthSlider.maxValue = playerMaxHealth;
-            playerHealthSlider.value = playerCurrentHealth;
-        }
     }
 
     public void UpdateMoveText(Color color, string text)
