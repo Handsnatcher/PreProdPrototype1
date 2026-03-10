@@ -30,35 +30,40 @@ public class DynamicCameraSystem : MonoBehaviour
     public Transform playerTarget;
     public Transform enemyTarget;
 
+    [Header("Framing")]
+    [Tooltip("How strongly the camera nudges to keep both characters in frame")]
+    [Range(0f, 1f)]
+    public float framingStrength = 0.3f;
+
     [Header("Player Shots")]
     public List<CameraShot> playerShots = new List<CameraShot>()
     {
         new CameraShot
         {
-            positionOffset = new Vector3(-4f, 2.5f, -6f),
+            positionOffset = new Vector3(-1.5f, 2f, -6f),
             lookOffset     = new Vector3(0f, 1f, 0f),
-            dollyDirection = new Vector3(1f, 0f, 0f),
-            dollySpeed     = 0.4f,
-            holdDuration   = 3f,
-            blendDuration  = 0.8f
+            dollyDirection = new Vector3(0.3f, 0f, 0f),
+            dollySpeed     = 0.15f,
+            holdDuration   = 5f,
+            blendDuration  = 1.5f
         },
         new CameraShot
         {
-            positionOffset = new Vector3(0f, 4f, -7f),
+            positionOffset = new Vector3(0f, 2.5f, -7f),
             lookOffset     = new Vector3(0f, 1f, 0f),
-            dollyDirection = new Vector3(-0.5f, 0f, 0.2f),
-            dollySpeed     = 0.3f,
-            holdDuration   = 3f,
-            blendDuration  = 1f
+            dollyDirection = new Vector3(-0.2f, 0f, 0f),
+            dollySpeed     = 0.1f,
+            holdDuration   = 5f,
+            blendDuration  = 1.5f
         },
         new CameraShot
         {
-            positionOffset = new Vector3(4f, 2f, -6f),
+            positionOffset = new Vector3(1.5f, 2f, -6f),
             lookOffset     = new Vector3(0f, 1f, 0f),
-            dollyDirection = new Vector3(-1f, 0.1f, 0f),
-            dollySpeed     = 0.5f,
-            holdDuration   = 3f,
-            blendDuration  = 0.7f
+            dollyDirection = new Vector3(-0.3f, 0f, 0f),
+            dollySpeed     = 0.15f,
+            holdDuration   = 5f,
+            blendDuration  = 1.5f
         }
     };
 
@@ -67,31 +72,30 @@ public class DynamicCameraSystem : MonoBehaviour
     {
         new CameraShot
         {
-            positionOffset = new Vector3(3f, 3f, -6f),
+            positionOffset = new Vector3(1.5f, 2f, -6f),
             lookOffset     = new Vector3(0f, 1f, 0f),
-            dollyDirection = new Vector3(-1f, 0f, 0f),
-            dollySpeed     = 0.4f,
-            holdDuration   = 3f,
-            blendDuration  = 0.8f
+            dollyDirection = new Vector3(-0.3f, 0f, 0f),
+            dollySpeed     = 0.15f,
+            holdDuration   = 4f,
+            blendDuration  = 1.5f
         },
         new CameraShot
         {
-            positionOffset = new Vector3(0f, 3f, -5f),
+            positionOffset = new Vector3(0f, 2.5f, -6f),
             lookOffset     = new Vector3(0f, 1f, 0f),
-            dollyDirection = new Vector3(0.3f, -0.1f, 0f),
-            dollySpeed     = 0.3f,
-            holdDuration   = 3f,
-            blendDuration  = 1.2f
+            dollyDirection = new Vector3(0.2f, 0f, 0f),
+            dollySpeed     = 0.1f,
+            holdDuration   = 4f,
+            blendDuration  = 1.5f
         }
     };
 
     [Header("Targeting Shot")]
-    [Tooltip("Offset from the player's position for the over-the-shoulder shot")]
     public Vector3 targetingPositionOffset = new Vector3(1.2f, 1.6f, -1.5f);
-    [Tooltip("How long to blend into and out of the targeting shot")]
     public float targetingBlendDuration = 0.4f;
 
     private Transform activeTarget;
+    private Transform secondaryTarget;
     private List<CameraShot> activeShots;
     private int currentShotIndex = 0;
     private Vector3 dollyAccumulator = Vector3.zero;
@@ -131,7 +135,6 @@ public class DynamicCameraSystem : MonoBehaviour
     public void SwitchToPlayerCamera()
     {
         if (isTargeting) return;
-
         if (playerTarget == null)
         {
             Debug.LogWarning("DynamicCameraSystem: playerTarget is not assigned.");
@@ -139,6 +142,7 @@ public class DynamicCameraSystem : MonoBehaviour
         }
 
         activeTarget = playerTarget;
+        secondaryTarget = enemyTarget;
         activeShots = playerShots;
         BeginShotCycle();
     }
@@ -146,7 +150,6 @@ public class DynamicCameraSystem : MonoBehaviour
     public void SwitchToEnemyCamera()
     {
         if (isTargeting) return;
-
         if (enemyTarget == null)
         {
             Debug.LogWarning("DynamicCameraSystem: enemyTarget is not assigned.");
@@ -154,16 +157,13 @@ public class DynamicCameraSystem : MonoBehaviour
         }
 
         activeTarget = enemyTarget;
+        secondaryTarget = playerTarget;
         activeShots = enemyShots;
         BeginShotCycle();
     }
 
     // TARGETING
 
-    /// <summary>
-    /// Call this from the card system when the player plays an attack card.
-    /// Stops the dynamic camera and moves to an over-the-shoulder targeting shot.
-    /// </summary>
     public void EnterTargetingMode()
     {
         if (isTargeting) return;
@@ -175,7 +175,6 @@ public class DynamicCameraSystem : MonoBehaviour
 
         isTargeting = true;
 
-        // Stop the dynamic shot cycle
         if (shotCycleCoroutine != null) StopCoroutine(shotCycleCoroutine);
         if (blendCoroutine != null) StopCoroutine(blendCoroutine);
 
@@ -183,20 +182,15 @@ public class DynamicCameraSystem : MonoBehaviour
         Debug.Log("DynamicCamera: Entered targeting mode.");
     }
 
-    /// <summary>
-    /// Call this from the card system after the player has chosen a target and the attack is resolved.
-    /// Returns the camera to the dynamic shot cycle.
-    /// </summary>
     public void ExitTargetingMode()
     {
         if (!isTargeting) return;
-
         isTargeting = false;
 
         if (targetingCoroutine != null) StopCoroutine(targetingCoroutine);
 
-        // Resume from the player dynamic shots
         activeTarget = playerTarget;
+        secondaryTarget = enemyTarget;
         activeShots = playerShots;
         BeginShotCycle();
 
@@ -214,7 +208,6 @@ public class DynamicCameraSystem : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / targetingBlendDuration);
 
-            // Over-the-shoulder: offset from player, looking at enemy
             Vector3 targetPos = playerTarget.position + targetingPositionOffset;
             Vector3 lookDir = (enemyTarget.position + Vector3.up) - targetPos;
 
@@ -224,7 +217,6 @@ public class DynamicCameraSystem : MonoBehaviour
             yield return null;
         }
 
-        // Hold the targeting shot, tracking the enemy while targeting is active
         while (isTargeting)
         {
             Vector3 targetPos = playerTarget.position + targetingPositionOffset;
@@ -259,11 +251,7 @@ public class DynamicCameraSystem : MonoBehaviour
                 continue;
             }
 
-            // Stop if target was destroyed
-            if (activeTarget == null)
-            {
-                yield break;
-            }
+            if (activeTarget == null) yield break;
 
             CameraShot shot = activeShots[currentShotIndex];
             dollyAccumulator = Vector3.zero;
@@ -272,16 +260,39 @@ public class DynamicCameraSystem : MonoBehaviour
             yield return blendCoroutine;
 
             float elapsed = 0f;
+            float maxDolly = 0.5f; // clamp how far the dolly can drift
+            Quaternion smoothRot = transform.rotation;
+
             while (elapsed < shot.holdDuration)
             {
-                // Stop if target was destroyed mid-hold
                 if (activeTarget == null) yield break;
 
                 elapsed += Time.deltaTime;
                 dollyAccumulator += shot.dollyDirection * shot.dollySpeed * Time.deltaTime;
 
-                transform.position = activeTarget.position + shot.positionOffset + dollyAccumulator;
-                transform.LookAt(activeTarget.position + shot.lookOffset);
+                // Clamp dolly so it never drifts too far
+                if (dollyAccumulator.magnitude > maxDolly)
+                    dollyAccumulator = dollyAccumulator.normalized * maxDolly;
+
+                Vector3 basePos = activeTarget.position + shot.positionOffset + dollyAccumulator;
+
+                if (secondaryTarget != null)
+                {
+                    Vector3 midpoint = (activeTarget.position + secondaryTarget.position) * 0.5f;
+                    Vector3 toMidpoint = midpoint - activeTarget.position;
+                    basePos += toMidpoint * framingStrength;
+                }
+
+                transform.position = basePos;
+
+                // Smooth the look rotation instead of snapping
+                Vector3 lookPoint = activeTarget.position + shot.lookOffset;
+                if (secondaryTarget != null)
+                    lookPoint = Vector3.Lerp(lookPoint, secondaryTarget.position + shot.lookOffset, framingStrength * 0.5f);
+
+                Quaternion targetRot = Quaternion.LookRotation(lookPoint - transform.position);
+                smoothRot = Quaternion.Slerp(smoothRot, targetRot, Time.deltaTime * 3f);
+                transform.rotation = smoothRot;
 
                 yield return null;
             }
@@ -294,8 +305,6 @@ public class DynamicCameraSystem : MonoBehaviour
     {
         Vector3 startPos = transform.position;
         Quaternion startRot = transform.rotation;
-        Vector3 endPos = activeTarget.position + shot.positionOffset;
-        Quaternion endRot = Quaternion.LookRotation((activeTarget.position + shot.lookOffset) - endPos);
 
         float elapsed = 0f;
         while (elapsed < shot.blendDuration)
@@ -305,6 +314,20 @@ public class DynamicCameraSystem : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / shot.blendDuration);
 
+            // Target position accounts for framing
+            Vector3 endPos = activeTarget.position + shot.positionOffset;
+            if (secondaryTarget != null)
+            {
+                Vector3 midpoint = (activeTarget.position + secondaryTarget.position) * 0.5f;
+                endPos += (midpoint - activeTarget.position) * framingStrength;
+            }
+
+            Vector3 lookPoint = activeTarget.position + shot.lookOffset;
+            if (secondaryTarget != null)
+                lookPoint = Vector3.Lerp(lookPoint, secondaryTarget.position + shot.lookOffset, framingStrength * 0.5f);
+
+            Quaternion endRot = Quaternion.LookRotation(lookPoint - endPos);
+
             transform.position = Vector3.Lerp(startPos, endPos, t);
             transform.rotation = Quaternion.Slerp(startRot, endRot, t);
 
@@ -312,8 +335,5 @@ public class DynamicCameraSystem : MonoBehaviour
         }
 
         if (activeTarget == null) yield break;
-
-        transform.position = endPos;
-        transform.rotation = endRot;
     }
 }
