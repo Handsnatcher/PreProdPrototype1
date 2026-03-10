@@ -228,17 +228,17 @@ PrefabInstance:
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: 'lines.Array.data[0]'
-      value: 'Knight: How much do you think this planet has changed?.'
+      value: 'Knight: I did not expect their animals to look that freaky.'
       objectReference: {fileID: 0}
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: 'lines.Array.data[1]'
-      value: "Devotee: We\u2019ll have to find out."
+      value: 'Devotee: What can you expect? This planet has been abandoned for years.'
       objectReference: {fileID: 0}
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: 'lines.Array.data[2]'
-      value: "Knight: Looks like there\u2019s a mutant right there!"
+      value: "Knight: This journey is going to be harder than I thought\u2026"
       objectReference: {fileID: 0}
     - target: {fileID: 6144884317476966672, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}

@@ -259,6 +259,12 @@ public class DynamicCameraSystem : MonoBehaviour
                 continue;
             }
 
+            // Stop if target was destroyed
+            if (activeTarget == null)
+            {
+                yield break;
+            }
+
             CameraShot shot = activeShots[currentShotIndex];
             dollyAccumulator = Vector3.zero;
 
@@ -268,6 +274,9 @@ public class DynamicCameraSystem : MonoBehaviour
             float elapsed = 0f;
             while (elapsed < shot.holdDuration)
             {
+                // Stop if target was destroyed mid-hold
+                if (activeTarget == null) yield break;
+
                 elapsed += Time.deltaTime;
                 dollyAccumulator += shot.dollyDirection * shot.dollySpeed * Time.deltaTime;
 
@@ -291,6 +300,8 @@ public class DynamicCameraSystem : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < shot.blendDuration)
         {
+            if (activeTarget == null) yield break;
+
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / shot.blendDuration);
 
@@ -299,6 +310,8 @@ public class DynamicCameraSystem : MonoBehaviour
 
             yield return null;
         }
+
+        if (activeTarget == null) yield break;
 
         transform.position = endPos;
         transform.rotation = endRot;

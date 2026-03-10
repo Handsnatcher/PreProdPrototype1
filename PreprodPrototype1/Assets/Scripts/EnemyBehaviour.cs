@@ -1,23 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class EnemyBehaviour : MonoBehaviour
 {
     public Player player;
 
-    //enemy attributes
-    GameObject[] enemies; 
-    public int enemyMaxHealth = 100;         //max health
-    public int enemyAttackCardDamage = 10;   //damage value when attacking
-    public int enemyDefenseCardValue = 10;   //how many hit points can it defend itself from
+    [Header("Attributes")]
+    public int enemyMaxHealth = 60;         //max health
+    public int enemyMaxDefense = 50;
+    public int enemyAttackCardDamage = 30;   //damage value when attacking
+    public int enemyDefenseCardValue = 5;   //how many hit points can it defend itself from
 
     public enum enemyDifficulty { easy, medium, difficult }; //affects "smartness" of AI
 
     public int enemyCurrentHealth;
     public int enemyCurrentDefense; //how many hit points to negate
 
+    [Header("UI")]
+    public Slider enemyHealthSlider;
+    public GameObject defenseSlider;
+    public Slider enemyDefenseSlider;
+
+    [Header("Design")]
     //design attributes
     [SerializeField] private Mesh enemyMesh;        //model
     [SerializeField] private Animation enemyIdle;   //idle animation
@@ -31,14 +40,22 @@ public class EnemyBehaviour : MonoBehaviour
     void Start()
     {
         enemyCurrentHealth = enemyMaxHealth;
-        UpdateHealthUI();
+        UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        defenseSlider.SetActive(false);
     }
+
 
     //FOR PROTOTYPE PURPOSES, SIMPLE ENEMY TURN
     public void EnemyTurn()
     {
         //random chance to attack vs defend
-        if (Random.value < 0.5f)
+        if (Random.value < 0.4f && enemyCurrentDefense <= enemyMaxDefense)
+        {
+            Debug.Log("Enemy Defended!");
+            EnemyDefense();
+            TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
+        }
+        else
         {
             Debug.Log("Enemy Attacked!");
             if (player)
@@ -50,18 +67,20 @@ public class EnemyBehaviour : MonoBehaviour
                 TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
             }
         }
-        else
-        {
-            Debug.Log("Enemy Defended!");
-            EnemyDefense();
-            TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!");
-        }
 
     }
 
     private void EnemyDefense()
     {
-        enemyCurrentDefense = enemyCurrentDefense + enemyDefenseCardValue;
+        enemyCurrentDefense += enemyDefenseCardValue;
+        enemyCurrentDefense = Mathf.Clamp(enemyCurrentDefense, 0, enemyMaxDefense);
+
+        if (enemyCurrentDefense > 0)
+        {
+            defenseSlider.SetActive(true);
+        }
+
+        UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
     }
 
     //enemy take damage
@@ -71,11 +90,18 @@ public class EnemyBehaviour : MonoBehaviour
         enemyCurrentHealth -= finalDamage;
         enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
 
-        UpdateHealthUI();
+        UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
 
         if (enemyCurrentHealth <= 0)
         {
             EnemyDeath();
+        }
+
+        //defense down
+        if (enemyCurrentDefense <= 0)
+        {
+            defenseSlider.SetActive(false);
         }
     }
 
@@ -85,9 +111,22 @@ public class EnemyBehaviour : MonoBehaviour
         //TODO: check if other enemies are in scene, if none then level is won
     }
 
-    private void UpdateHealthUI()
+    public void UpdateEnemyHealthSlider(int enemyCurrentHealth, int enemyMaxHealth)
     {
-        TurnManager.Instance.UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        if (enemyHealthSlider != null)
+        {
+            enemyHealthSlider.maxValue = enemyMaxHealth;
+            enemyHealthSlider.value = enemyCurrentHealth;
+        }
+    }
+
+    public void UpdateEnemyDefenseSlider(int enemyCurrentDefense, int enemyMaxDefense)
+    {
+        if (enemyDefenseSlider != null)
+        {
+            enemyDefenseSlider.maxValue = enemyMaxDefense;
+            enemyDefenseSlider.value = enemyCurrentDefense;
+        }
     }
 
     ///////////////////////////////ANIMATION FUNCTIONS///////////////////////////////

@@ -9,6 +9,8 @@ public class Dialogue : MonoBehaviour
     public TextMeshProUGUI textComponent;
     public string[] lines;
     public float textSpeed; //character per second
+    private AudioSource source;
+    public AudioClip soundEffectClip;
 
     private int index;
 
@@ -17,6 +19,7 @@ public class Dialogue : MonoBehaviour
     {
         textComponent.text = string.Empty;
         BeginDialogue();
+        source = GetComponent<AudioSource>();
     }
 
     //check if player skipped through dialogue
@@ -40,7 +43,9 @@ public class Dialogue : MonoBehaviour
     void BeginDialogue()
     {
         index = 0;
-        StartCoroutine(ShowLine());    }
+        StartCoroutine(ShowLine());
+        PlayDialogueSound();
+    }
 
     IEnumerator ShowLine()
     {
@@ -52,6 +57,15 @@ public class Dialogue : MonoBehaviour
         }
     }
 
+    //TODO: change pitch randomnly, play for length of text?
+    void PlayDialogueSound()
+    {
+        if (source != null && soundEffectClip != null)
+        {
+            source.PlayOneShot(soundEffectClip, 0.5f);
+        }
+    }
+
     void NextLine()
     {
         if (index < lines.Length - 1)
@@ -59,6 +73,7 @@ public class Dialogue : MonoBehaviour
             index++;
             textComponent.text = string.Empty;
             StartCoroutine(ShowLine());
+            PlayDialogueSound();
         }
         else
         {

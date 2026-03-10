@@ -223,22 +223,22 @@ PrefabInstance:
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: lines.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: 'lines.Array.data[0]'
-      value: 'Knight: How much do you think this planet has changed?.'
+      value: "Knight: I think we\u2019re almost there!"
       objectReference: {fileID: 0}
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: 'lines.Array.data[1]'
-      value: "Devotee: We\u2019ll have to find out."
+      value: "Devotee: I hope so\u2026I think we need to increase our defenses\u2026"
       objectReference: {fileID: 0}
     - target: {fileID: 3305906986872688624, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
       propertyPath: 'lines.Array.data[2]'
-      value: "Knight: Looks like there\u2019s a mutant right there!"
+      value: "Knight: This journey is going to be harder than I thought\u2026"
       objectReference: {fileID: 0}
     - target: {fileID: 6144884317476966672, guid: 334943e2f2049c94dbefca8df7cf6fa7,
         type: 3}
