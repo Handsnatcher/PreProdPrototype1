@@ -84,11 +84,13 @@ public class Player : MonoBehaviour
     }
 
     //call when defense card is played
-    public void PlayerDefense()
+    public void PlayerDefense(int value)
     {
 
-        playerCurrentDefense += playerDefenseCardValue; 
-        playerCurrentDefense = Mathf.Clamp(playerCurrentDefense, 0, playerMaxDefense);
+        playerCurrentDefense += value;
+        Debug.Log("Player defense" + playerCurrentDefense);
+        // playerCurrentDefense = Mathf.Clamp(playerCurrentDefense, 0, playerMaxDefense);
+        Debug.Log("Player defense after clamp" + playerCurrentDefense);
 
         TurnManager.Instance.UpdateMoveText(Color.blue, "Defended!" + playerCurrentDefense);
 

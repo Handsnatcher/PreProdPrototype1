@@ -191,7 +191,8 @@ public class DeckManager : MonoBehaviour
                 if (player!= null)
                 {
                     player.playerDefenseCardValue = card.effectValue;
-                    player.PlayerDefense();
+                    Debug.Log(card.effectValue);
+                    player.PlayerDefense(card.effectValue);
                 }
                 break;
         }

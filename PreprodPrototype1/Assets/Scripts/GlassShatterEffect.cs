@@ -31,6 +31,10 @@ public class GlassShatterEffect : MonoBehaviour
     [Header("Camera")]
     public Camera targetCamera;
 
+    [Header("Audio")]
+    private AudioSource source;
+    public AudioClip soundEffectClip;
+
     [Header("Debug")]
     public bool debugKey = true;
 
@@ -44,6 +48,7 @@ public class GlassShatterEffect : MonoBehaviour
             targetCamera = Camera.main;
         if (targetCamera == null)
             Debug.LogWarning("GlassShatterEffect: Assign a camera.");
+        source = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -57,6 +62,12 @@ public class GlassShatterEffect : MonoBehaviour
         if (targetCamera == null) return;
         ClearShards();
         StartCoroutine(CaptureAndShatter());
+
+        //play shatter sound
+        if (source != null && soundEffectClip != null)
+        {
+            source.PlayOneShot(soundEffectClip, 0.2f);
+        }
     }
 
     IEnumerator CaptureAndShatter()
