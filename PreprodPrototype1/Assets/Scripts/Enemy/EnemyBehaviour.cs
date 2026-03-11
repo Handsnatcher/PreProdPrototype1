@@ -12,7 +12,7 @@ public class EnemyBehaviour : MonoBehaviour
 
     [Header("Attributes")]
     public int enemyMaxHealth = 60;         //max health
-    public int enemyMaxDefense = 50;
+    public int enemyMaxDefense = 20;
     public int enemyAttackCardDamage = 30;   //damage value when attacking
     public int enemyDefenseCardValue = 5;   //how many hit points can it defend itself from
 
@@ -25,6 +25,11 @@ public class EnemyBehaviour : MonoBehaviour
     public Slider enemyHealthSlider;
     public GameObject defenseSlider;
     public Slider enemyDefenseSlider;
+
+    [Header("Audio")]
+    private AudioSource source;
+    public AudioClip attackSoundEffect;
+    public AudioClip defendSoundEffect;
 
     [Header("Design")]
     //design attributes
@@ -42,6 +47,7 @@ public class EnemyBehaviour : MonoBehaviour
         enemyCurrentHealth = enemyMaxHealth;
         UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
         defenseSlider.SetActive(false);
+        source = GetComponent<AudioSource>();
     }
 
 
@@ -57,17 +63,28 @@ public class EnemyBehaviour : MonoBehaviour
         }
         else
         {
-            Debug.Log("Enemy Attacked!");
-            if (player)
-            {
-                //NOTE: damage value can be changed depending on difficulty later (for now default is 10)
-                player.TakeDamage(enemyAttackCardDamage);
-
-                //show damage UI
-                TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
-            }
+            EnemyAttack();
         }
 
+    }
+
+    private void EnemyAttack()
+    {
+        Debug.Log("Enemy Attacked!");
+        if (player)
+        {
+            //NOTE: damage value can be changed depending on difficulty later (for now default is 10)
+            player.TakeDamage(enemyAttackCardDamage);
+
+            //show damage UI
+            TurnManager.Instance.UpdateMoveText(Color.red, "Attacked!");
+
+            //play sound
+            if (source != null && attackSoundEffect != null)
+            {
+                source.PlayOneShot(attackSoundEffect, 0.5f);
+            }
+        }
     }
 
     private void EnemyDefense()
@@ -81,6 +98,13 @@ public class EnemyBehaviour : MonoBehaviour
         }
 
         UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
+
+        //play sound
+        if (source != null && defendSoundEffect != null)
+        {
+            source.PlayOneShot(defendSoundEffect, 0.5f);
+        }
+
     }
 
     //enemy take damage

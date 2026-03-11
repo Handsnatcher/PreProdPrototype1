@@ -10,8 +10,8 @@ public class Player : MonoBehaviour
     public int playerCurrentHealth;
     public int playerMaxDefense = 100;
     public int playerCurrentDefense; //how many hit points to negate
-    public int playerAttackCardDamage = 30;   //damage value when attacking
-    public int playerDefenseCardValue = 10;   //how many hit points can it defend itself from
+    public int playerAttackCardDamage = 20;   //damage value when attacking
+    public int playerDefenseCardValue = 20;   //how many hit points can it defend itself from
 
     private const string PLAYER_HEALTH_KEY = "PlayerHealth";    //for player prefs
 
@@ -22,6 +22,11 @@ public class Player : MonoBehaviour
     public Slider playerHealthSlider;
     public GameObject defenseSlider;
     public Slider playerDefenseSlider;
+
+    [Header("Audio")]
+    private AudioSource source;
+    public AudioClip attackSoundEffect;
+    public AudioClip defendSoundEffect;
 
     private DynamicCameraSystem cameraSystem;
 
@@ -39,6 +44,7 @@ public class Player : MonoBehaviour
         }
 
         cameraSystem = Camera.main.GetComponent<DynamicCameraSystem>();
+        source = GetComponent<AudioSource>();
         if (cameraSystem == null)
             Debug.LogWarning("Player: No DynamicCameraSystem found on Main Camera.");
 
@@ -64,7 +70,16 @@ public class Player : MonoBehaviour
     public void TakeDamage(int enemyDamage = 10)
     {
         //deal damage to player
-        playerCurrentHealth -= enemyDamage;
+        if (playerCurrentDefense > 0)
+        {
+            playerCurrentDefense -= enemyDamage;
+        }
+        else if (playerCurrentDefense <= 0)
+        {
+            defenseSlider.SetActive(false);
+            playerCurrentHealth -= enemyDamage;
+        }
+
 
         playerCurrentHealth = Mathf.Clamp(playerCurrentHealth, 0, playerMaxHealth);
         PlayerPrefs.SetInt(PLAYER_HEALTH_KEY, playerCurrentHealth);
@@ -75,11 +90,6 @@ public class Player : MonoBehaviour
         if (playerCurrentHealth <= 0)
         {
             TurnManager.Instance.SetGameOver();
-        }
-        //defense down
-        if (playerCurrentDefense <= 0)
-        {
-            defenseSlider.SetActive(false);
         }
     }
 
@@ -100,6 +110,12 @@ public class Player : MonoBehaviour
         }
 
         UpdatePlayerDefenseSlider(playerCurrentDefense, playerMaxDefense);
+
+        //play sound
+        if (source != null && defendSoundEffect != null)
+        {
+            source.PlayOneShot(defendSoundEffect, 0.5f);
+        }
 
     }
 
@@ -141,6 +157,12 @@ public class Player : MonoBehaviour
 
         // Return camera to dynamic shots after attack resolves
         cameraSystem?.ExitTargetingMode();
+
+        //play sound
+        if (source != null && attackSoundEffect != null)
+        {
+            source.PlayOneShot(attackSoundEffect, 0.5f);
+        }
     }
 
     public void UpdatePlayerHealthSlider(int playerCurrentHealth, int playerMaxHealth)
