@@ -39,6 +39,8 @@ public class EnemyBehaviour : MonoBehaviour
     [SerializeField] private Mesh enemyDefense;     //defense card to play
     [SerializeField] private Mesh enemySkill;       //skill card to play?
 
+    private HitFlash hitFlash;
+
     //ideas for future: enemy states? can change behaviour depending on health
     //e.g. if health <= 50% of max health, attack; else if health >= 50% of max health, have a 3/4 chance to defend, otherwise attack
 
@@ -48,6 +50,7 @@ public class EnemyBehaviour : MonoBehaviour
         UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
         defenseSlider.SetActive(false);
         source = GetComponent<AudioSource>();
+        hitFlash = GetComponent<HitFlash>();
     }
 
 
@@ -116,6 +119,10 @@ public class EnemyBehaviour : MonoBehaviour
 
         UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
         UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
+
+        // Hit flash and screen shake when player takes damage
+        hitFlash?.Flash();
+        ScreenShake.Instance?.Shake(0.3f, 0.12f);
 
         if (enemyCurrentHealth <= 0)
         {

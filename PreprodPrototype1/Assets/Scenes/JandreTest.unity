@@ -278,7 +278,8 @@ MonoBehaviour:
   fadeOutDuration: 0.6
   moveUpDistance: 50
   enemyThinkDuration: 2
-  enemies: []
+  enemies:
+  - {fileID: 532183981}
   currentState: 0
   currentMana: 0
   turnCount: 0
@@ -710,7 +711,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1070712039}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1070712040}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dc022089d4613443a50d973d81262a8, type: 3}
@@ -1006,10 +1007,13 @@ MonoBehaviour:
   handParent: {fileID: 469776288}
   cardUIPrefab: {fileID: 4884188766229371104, guid: 6017dd21d444046478372850a9e210ed,
     type: 3}
+  deckImage: {fileID: 0}
   deckCountText: {fileID: 0}
+  discardImage: {fileID: 0}
   discardCountText: {fileID: 0}
   cardsToDrawPerTurn: 5
   player: {fileID: 1309523930}
+  targetingSystem: {fileID: 0}
   deck: []
   hand: []
   discard: []
@@ -1122,8 +1126,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2742128089570526442, guid: 2a043c89e289e704cadd89b4170205ec,
+        type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 1070712041}
   m_SourcePrefab: {fileID: 100100000, guid: 2a043c89e289e704cadd89b4170205ec, type: 3}
+--- !u!1 &1070712040 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2742128089570526442, guid: 2a043c89e289e704cadd89b4170205ec,
+    type: 3}
+  m_PrefabInstance: {fileID: 1070712039}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1070712041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070712040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ed653b95e509b74e85f7cff43a32158, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.15
+  flashCount: 2
+--- !u!4 &1070712046 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3262345920700259920, guid: 2a043c89e289e704cadd89b4170205ec,
+    type: 3}
+  m_PrefabInstance: {fileID: 1070712039}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1083706086
 GameObject:
   m_ObjectHideFlags: 0
@@ -1566,6 +1601,21 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1309523935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 366623808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ed653b95e509b74e85f7cff43a32158, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.15
+  flashCount: 2
 --- !u!1 &1317043170
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,6 +1629,7 @@ GameObject:
   - component: {fileID: 1317043172}
   - component: {fileID: 1317043171}
   - component: {fileID: 1317043175}
+  - component: {fileID: 1317043176}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -1717,7 +1768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 277909866}
-  enemyTarget: {fileID: 0}
+  enemyTarget: {fileID: 1070712046}
   framingStrength: 0.3
   playerShots:
   - positionOffset: {x: -2, y: 1.5, z: -3}
@@ -1753,6 +1804,18 @@ MonoBehaviour:
     blendDuration: 1.2
   targetingPositionOffset: {x: 8.75, y: 3, z: -0.5}
   targetingBlendDuration: 0.4
+--- !u!114 &1317043176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317043170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1731be37e2c70614fb52f42bc604d36b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1372751360
 GameObject:
   m_ObjectHideFlags: 0
@@ -3155,6 +3218,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1309523934}
+    - targetCorrespondingSourceObject: {fileID: 4008634277091687279, guid: a908aea46018e2c44af44d580ac90a7a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1309523935}
   m_SourcePrefab: {fileID: 100100000, guid: a908aea46018e2c44af44d580ac90a7a, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

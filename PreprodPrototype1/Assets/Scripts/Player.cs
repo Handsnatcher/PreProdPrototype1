@@ -30,6 +30,8 @@ public class Player : MonoBehaviour
 
     private DynamicCameraSystem cameraSystem;
 
+    private HitFlash hitFlash;
+
     private void Start()
     {
         //set player health
@@ -42,6 +44,8 @@ public class Player : MonoBehaviour
             playerCurrentHealth = playerMaxHealth;
             PlayerPrefs.SetInt(PLAYER_HEALTH_KEY, playerCurrentHealth);
         }
+
+        hitFlash = GetComponent<HitFlash>();
 
         cameraSystem = Camera.main.GetComponent<DynamicCameraSystem>();
         source = GetComponent<AudioSource>();
@@ -80,6 +84,7 @@ public class Player : MonoBehaviour
             playerCurrentHealth -= enemyDamage;
         }
 
+        hitFlash?.Flash();
 
         playerCurrentHealth = Mathf.Clamp(playerCurrentHealth, 0, playerMaxHealth);
         PlayerPrefs.SetInt(PLAYER_HEALTH_KEY, playerCurrentHealth);
