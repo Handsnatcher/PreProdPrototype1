@@ -22,6 +22,7 @@ public class NodeSaveData
     public bool isActivated;
     public int nodeLevel;
     public Vector2Int coord;
+    public Vector3 pos;
     public List<int> connectedNode = new List<int>();
 }
 
@@ -33,6 +34,7 @@ public class Node : MonoBehaviour
     public bool isActivated = false;
     public int nodeLevel;
     public Vector2Int coord;
+    public Vector3 pos;
     public List<Node> connectedNodes = new List<Node>();
     private Button button;
 
@@ -70,19 +72,36 @@ public class Node : MonoBehaviour
 
         PlayerPrefs.Save();
 
+        Debug.Log("loading scene!");
+
         switch(nodeType)
         {
             case NodeType.BATTLE:
                 SceneManager.LoadScene("JandreTest");
                 break;
             case NodeType.REST:
-                SceneManager.LoadScene("00_StoryScene"); // for debug purpose
+                SceneManager.LoadScene("RestScene"); // for debug purpose
                 break;
             case NodeType.SHOP:
                 SceneManager.LoadScene("MapScene"); // for debug purpose
                 break; 
             case NodeType.EVENT:
-                SceneManager.LoadScene("MapScene"); // for debug purpose
+                if (nodeLevel < 1)
+                {
+                    SceneManager.LoadScene("00_StoryScene");
+                }
+                else if (nodeLevel < 3)
+                {
+                    SceneManager.LoadScene("01_StoryScene");
+                }
+                else if (nodeLevel < 6)
+                {
+                    SceneManager.LoadScene("02_StoryScene");
+                }
+                else if (nodeLevel < 10)
+                {
+                    SceneManager.LoadScene("03_StoryScene");
+                }
                 PlayerPrefs.SetInt("HasCompanion", 1);
                 break;
             default:
