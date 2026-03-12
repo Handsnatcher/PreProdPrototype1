@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,8 +22,8 @@ public class MapManager : MonoBehaviour
     public Dictionary<Vector2Int, Node> nodes = new Dictionary<Vector2Int, Node>();
     //public List<LineRenderer> lines;
     public List<UILine> lines;
-    private int gridHeight = 15;
-    private int gridWidth = 8;
+    public int gridHeight = 10;
+    public int gridWidth = 8;
     private string savePath => Path.Combine(Application.persistentDataPath, "MapData.json");
 
     // Start is called before the first frame update
@@ -80,7 +81,8 @@ public class MapManager : MonoBehaviour
             for (int j = 0; j < gridWidth; j++)
             {
                 Node node = Instantiate(nodeObject, nodesTransform).GetComponent<Node>();
-                node.transform.localPosition = new Vector3((j - (gridWidth - 1) / 2) * 100, (i) * 100, 0);
+                node.pos = new Vector3((j - (gridWidth - 1) / 2) * 100 + Random.Range(-20, 20), (i) * 100 + Random.Range(-20, 20), 0);
+                node.transform.localPosition = node.pos;
                 node.id = i * gridWidth + j;
                 node.coord = new Vector2Int(j, i);
                 node.nodeType = (NodeType)Random.Range(0, 3);
@@ -133,6 +135,10 @@ public class MapManager : MonoBehaviour
                     p.Value.connectedNodes.Clear(); // reset
                     p.Value.isUnlocked = true; // unlock first row
                     p.Value.ActivateButton();
+
+                    //set first row to battle
+                    p.Value.nodeType = NodeType.BATTLE;
+                    p.Value.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = p.Value.nodeType.ToString()[0].ToString();
 
                     if (p.Key.x == 0) // first node in the row
                     {
@@ -348,7 +354,7 @@ public class MapManager : MonoBehaviour
                     {
                         if (p.Key.x == 0) // first node in the row
                         {
-                            connectionSize = Random.Range(1, 3);
+                            connectionSize = Random.Range(1, 2);// TEMP reduced max connection size
                             if (connectionSize == 2) // connect both node above
                             {
                                 // set to be connected node
@@ -388,7 +394,7 @@ public class MapManager : MonoBehaviour
                             }
 
                             int possibleConnectionCount = gridWidth - highestX; // -1 for grid +1 for connection
-                            connectionSize = Random.Range(1, possibleConnectionCount + 1);
+                            connectionSize = Random.Range(1, possibleConnectionCount);// TEMP reduced max connection size
 
                             if (connectionSize == 2) // connect both node above
                             {
@@ -441,7 +447,7 @@ public class MapManager : MonoBehaviour
                             }
 
                             int possibleConnectionCount = p.Key.x - highestX + 2; // +2 for max node possible while prevous node connected to the one above
-                            connectionSize = Random.Range(1, possibleConnectionCount + 1);
+                            connectionSize = Random.Range(1, possibleConnectionCount); // TEMP reduced max connection size
 
                             if (connectionSize == 3) // connect all 3 nodes
                             {
@@ -635,6 +641,7 @@ public class MapManager : MonoBehaviour
             nodeData.nodeLevel = p.Value.nodeLevel;
             nodeData.isActivated = p.Value.isActivated;
             nodeData.coord = p.Value.coord;
+            nodeData.pos = p.Value.pos;
 
             foreach (var n in p.Value.connectedNodes)
             {
@@ -647,6 +654,8 @@ public class MapManager : MonoBehaviour
         // save to file
         string json = JsonUtility.ToJson(mapData);
         File.WriteAllText(savePath, json);
+
+        Debug.Log("map saved successfully!");
     }
 
     public void LoadMap()
@@ -670,6 +679,7 @@ public class MapManager : MonoBehaviour
 
             node.id = nodeData.id;
             node.coord = nodeData.coord;
+            node.pos = nodeData.pos;
             node.isActivated = nodeData.isActivated;
             node.isUnlocked = nodeData.isUnlocked;
             node.nodeLevel = nodeData.nodeLevel;
@@ -682,7 +692,7 @@ public class MapManager : MonoBehaviour
             }
             else
             {
-                node.transform.localPosition = new Vector3((node.coord.x - (gridWidth - 1) / 2) * 100, (node.coord.y) * 100, 0);
+                node.transform.localPosition = nodeData.pos;
             }
 
             node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString();

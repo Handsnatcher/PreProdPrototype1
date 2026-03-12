@@ -18,10 +18,22 @@ EditorBuildSettings:
     path: Assets/Scenes/StoryScenes/00_StoryScene.unity
     guid: 1670682c3dc5f174c85be45acd529245
   - enabled: 1
+    path: Assets/Scenes/StoryScenes/01_StoryScene.unity
+    guid: cd7ebdeec3f859249a061fdc0abbbc30
+  - enabled: 1
+    path: Assets/Scenes/StoryScenes/02_StoryScene.unity
+    guid: 0bf64250470eb4c478b3a8a12a423e39
+  - enabled: 1
+    path: Assets/Scenes/StoryScenes/03_StoryScene.unity
+    guid: aee587813efe709459f82643e43a6e26
+  - enabled: 1
     path: Assets/Scenes/Death.unity
     guid: 758ca8d06e82d634fb3ef555eb5973ea
   - enabled: 1
     path: Assets/Scenes/LuioTest.unity
     guid: 60ce029f08d8389469d35709dfbd4b5e
+  - enabled: 1
+    path: Assets/Scenes/StoryScenes/RestScene.unity
+    guid: bc0d00fc21d55ce45bb69d9d83220446
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
