@@ -46,7 +46,12 @@ public class PersistentDeck : MonoBehaviour
     /// </summary>
     public List<Card> GetCurrentDeckCopy()
     {
-        return new List<Card>(masterDeck); // gives copy of masterDeck
+        List<Card> copy = new List<Card>(masterDeck.Count);
+        foreach (Card template in masterDeck)
+        {
+            copy.Add(template.CreateRuntimeInstance());
+        }
+        return copy;
     }
 
     // Getter if other systems need to read without modifying

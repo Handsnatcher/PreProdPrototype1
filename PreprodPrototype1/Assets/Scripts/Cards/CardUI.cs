@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CardUI : MonoBehaviour
+public class CardUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Components")]
     [SerializeField] private Image fullCardImage;
@@ -21,6 +21,7 @@ public class CardUI : MonoBehaviour
     private DeckManager deckManager;
     private Button button;
     private RectTransform rectTransform;
+    private bool isHovered = false;
 
     private void Awake()
     {
@@ -43,6 +44,11 @@ public class CardUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets up this card UI with its data and owning DeckManager
+    /// </summary>
+    /// <param name="card">The card data to display</param>
+    /// <param name="manager">The DeckManager that owns this card</param>
     public void Initialize(Card card, DeckManager manager)
     {
         cardData = card;
@@ -55,9 +61,14 @@ public class CardUI : MonoBehaviour
 
         // Reset visuals
         UpdateInteractable();
+
         transform.localScale = Vector3.one * scaleNormal;
     }
 
+    /// <summary>
+    /// Updates whether this card is playable based on current turn and mana, AND targeting state
+    /// Changes interactable state and tint of the card image
+    /// </summary>
     public void UpdateInteractable()
     {
         if (button == null || cardData == null || deckManager == null)
@@ -65,18 +76,33 @@ public class CardUI : MonoBehaviour
             return;
         }
 
-        bool canPlay =
-            TurnManager.Instance?.IsPlayerTurn == true &&
-            TurnManager.Instance?.CurrentMana >= cardData.manaCost;
+        bool isPlayerTurn = TurnManager.Instance?.IsPlayerTurn == true;
+        bool hasEnoughMana = TurnManager.Instance?.CurrentMana >= cardData.manaCost;
+        bool targetingActive = TargetingSystem.Instance?.IsTargeting == true;
+        bool isTheSelectedCard = targetingActive && cardData == TargetingSystem.Instance.SelectedAttackCard;
 
-        button.interactable = canPlay;
+        button.interactable = isPlayerTurn && (!targetingActive || isTheSelectedCard );
 
-        if (fullCardImage != null)
+        if (isTheSelectedCard)
         {
-            fullCardImage.color = canPlay ? normalColor : new Color(0.6f, 0.6f, 0.6f, 0.9f);
+            fullCardImage.color = selectedColor;
         }
+        else if (isPlayerTurn && hasEnoughMana && !targetingActive)
+        {
+            fullCardImage.color = normalColor;
+        }
+        else
+        {
+            fullCardImage.color = new Color(0.6f, 0.6f, 0.6f, 0.9f);
+        }
+
+        UpdateScale();
     }
 
+    /// <summary>
+    /// Called when the player clicks this card. Attempts to play it via DeckManager
+    /// Triggers success/fail visual feedback (fail not working)
+    /// </summary>
     private void OnCardClicked()
     {
         if (deckManager == null || cardData == null)
@@ -84,20 +110,40 @@ public class CardUI : MonoBehaviour
             return;
         }
 
-        bool success = deckManager.PlayCard(cardData);
+        bool hasEnoughMana = TurnManager.Instance?.CurrentMana >= cardData.manaCost;
 
-        if (success)
+        if (!hasEnoughMana)
         {
-            // Play animation placeholder
-            StartCoroutine(PlayCardAnimation());
+            //StartCoroutine(ShakeFeedback(5.0f, 6, 0.05f));
+        }
+
+        if (cardData.type == Card.CardType.Attack)
+        {
+            deckManager.StartAttackTargeting(cardData);
         }
         else
         {
-            // Error animation placeholder
-            StartCoroutine(ShakeFeedback(0.12f, 6));
+
+            bool success = deckManager.PlayCard(cardData);
+
+            if (success)
+            {
+                // Play animation placeholder
+                StartCoroutine(PlayCardAnimation());
+            }
+            else
+            {
+                // Error animation placeholder
+                //StartCoroutine(ShakeFeedback(5.0f, 6, 0.05f));
+            }
         }
     }
 
+    /// <summary>
+    /// Coroutine that plays a visual animation when a card is successfully played
+    /// Scales up, then shrinks and fades out before destroying the GameObject
+    /// </summary>
+    /// <returns></returns>
     public System.Collections.IEnumerator PlayCardAnimation()
     {
         button.interactable = false;
@@ -132,30 +178,67 @@ public class CardUI : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private System.Collections.IEnumerator ShakeFeedback(float strength, int vibrato)
+    /// <summary>
+    /// Coroustine that plays a shake/vibrate feedback animation when failed to play card
+    /// </summary>
+    /// <param name="strength">Max offset distance per shake</param>
+    /// <param name="shakes">Number of shakes</param>
+    /// <param name="durationPerShake">How long each shake is</param>
+    /// <returns></returns>
+    private System.Collections.IEnumerator ShakeFeedback(float strength, int shakes, float durationPerShake)
     {
         Vector3 originalPos = rectTransform.anchoredPosition;
 
-        for (int i = 0; i < vibrato; i++)
+        for (int i = 0; i < shakes; i++)
         {
-            rectTransform.anchoredPosition += (Vector2)Random.insideUnitSphere * strength;
-            yield return new WaitForSeconds(0.04f);
+            float direction = (i % 2 == 0) ? 1f : -1f;
+            float offsetAmount = strength * (1f - (float)i / shakes);
+
+            Vector2 offset = Vector2.right * direction * offsetAmount;
+            rectTransform.anchoredPosition = originalPos + (Vector3)offset;
+
+            yield return new WaitForSeconds(durationPerShake);
         }
 
         rectTransform.anchoredPosition = originalPos;
     }
 
-    public void OnPointerEnter()
+    /// <summary>
+    /// Called when pointer enters this card (hover start)
+    /// </summary>
+    public void OnPointerEnter(PointerEventData eventData)
     {
         if (!button.interactable)
-        {
             return;
-        }
-        transform.localScale = Vector3.one * scaleOnHover;
+
+        isHovered = true;
+        UpdateScale();
     }
 
-    public void OnPointerExit()
+    /// <summary>
+    /// Called when pointer exits this card (hover end)
+    /// </summary>
+    public void OnPointerExit(PointerEventData eventData)
     {
-        transform.localScale = Vector3.one * scaleNormal;
+        isHovered = false;
+        UpdateScale();
+    }
+
+    /// <summary>
+    /// Scales card depending on selected / isHovered state
+    /// </summary>
+    private void UpdateScale()
+    {
+        bool targetingActive = TargetingSystem.Instance?.IsTargeting == true;
+        bool isTheSelectedCard = targetingActive && cardData == TargetingSystem.Instance?.SelectedAttackCard;
+
+        if (isTheSelectedCard || (isHovered && button.interactable))
+        {
+            transform.localScale = Vector3.one * scaleOnHover;
+        }
+        else
+        {
+            transform.localScale = Vector3.one * scaleNormal;
+        }
     }
 }

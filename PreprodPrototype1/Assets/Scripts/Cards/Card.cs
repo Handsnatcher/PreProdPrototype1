@@ -11,6 +11,15 @@ public class Card : ScriptableObject
     public Sprite artwork; // card art
     public CardType type;
     public int manaCost = 1;
-    public int effectValue; 
+    public int effectValue;
 
+    /// <summary>
+    /// Creates a unique runtime instance of a card
+    /// So that all cards of the same type are still unique
+    /// </summary>
+    /// <returns>New unique card</returns>
+    public Card CreateRuntimeInstance()
+    {
+        return Instantiate(this);
+    }
 }
