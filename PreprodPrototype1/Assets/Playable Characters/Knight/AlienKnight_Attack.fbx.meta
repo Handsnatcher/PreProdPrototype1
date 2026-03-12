@@ -3,7 +3,27 @@ guid: 4f8190610d5bf2644aaae621603ce2d2
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_SciFI_Sword
+    second: {fileID: 2100000, guid: 53fe5c7f1b7435c44a03e6bd1f88e900, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_SciFi_Sword_Blade
+    second: {fileID: 2100000, guid: c1f96308976f12f4dabf0e647a5f7b85, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TX_AlienKnight_Body
+    second: {fileID: 2100000, guid: 74e1084160c8b9d4fbd9d21fc0924565, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TX_AlienKnight_Head
+    second: {fileID: 2100000, guid: cf6d86e140385b84d80f7d302ba09156, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
