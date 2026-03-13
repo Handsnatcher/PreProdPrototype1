@@ -44,4 +44,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 095d63e31b539ef4dbda204d27f1ea1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  obj: {fileID: 0}
+  nodeObject: {fileID: 0}
+  lineObject: {fileID: 0}
+  canvasTransform: {fileID: 0}
+  linesTransform: {fileID: 0}
+  nodesTransform: {fileID: 0}
+  lines: []
+  gridHeight: 10
+  gridWidth: 8
+  battleSprite: {fileID: 21300000, guid: 0bda0f64abb2fe643bf73cf363a453cc, type: 3}
+  restSprite: {fileID: 21300000, guid: d9b07d038f0250e4087cd1bf615cccd0, type: 3}
+  eventSprite: {fileID: 21300000, guid: 41bb14904d65eab44b503c161eea2c52, type: 3}

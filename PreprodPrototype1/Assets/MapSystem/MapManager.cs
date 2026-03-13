@@ -24,6 +24,10 @@ public class MapManager : MonoBehaviour
     public List<UILine> lines;
     public int gridHeight = 10;
     public int gridWidth = 8;
+
+    public Sprite battleSprite;
+    public Sprite restSprite;
+    public Sprite eventSprite;
     private string savePath => Path.Combine(Application.persistentDataPath, "MapData.json");
 
     // Start is called before the first frame update
@@ -87,7 +91,8 @@ public class MapManager : MonoBehaviour
                 node.coord = new Vector2Int(j, i);
                 node.nodeType = (NodeType)Random.Range(0, 3);
                 node.nodeLevel = i + 1;
-                node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString(); // node text(TODO: replace with image)
+                DrawIcon(node);
+                //node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString(); // node text(TODO: replace with image)
 
                 nodes[new Vector2Int(j, i)] = node;
             }
@@ -138,7 +143,8 @@ public class MapManager : MonoBehaviour
 
                     //set first row to battle
                     p.Value.nodeType = NodeType.BATTLE;
-                    p.Value.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = p.Value.nodeType.ToString()[0].ToString();
+                    DrawIcon(p.Value);
+                    //p.Value.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = p.Value.nodeType.ToString()[0].ToString();
 
                     if (p.Key.x == 0) // first node in the row
                     {
@@ -700,7 +706,8 @@ public class MapManager : MonoBehaviour
                 node.transform.localPosition = nodeData.pos;
             }
 
-            node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString();
+            DrawIcon(node);
+            //node.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = node.nodeType.ToString()[0].ToString();
 
             nodes[node.coord] = node;
             indexedNodes[node.id] = node;
@@ -720,6 +727,29 @@ public class MapManager : MonoBehaviour
             }
 
             DrawMapPath(node);
+        }
+    }
+
+    private void DrawIcon(Node n)
+    {
+        switch (n.nodeType)
+        {
+            case NodeType.BATTLE:
+                n.GetComponentInChildren<Button>().transform.Find("Icon").GetComponent<Image>().sprite = battleSprite;
+                break;
+            case NodeType.REST:
+                n.GetComponentInChildren<Button>().transform.Find("Icon").GetComponent<Image>().sprite = restSprite;
+                break;
+            case NodeType.EVENT:
+                n.GetComponentInChildren<Button>().transform.Find("Icon").GetComponent<Image>().sprite = eventSprite;
+                break;
+            case NodeType.SHOP:
+                break;
+            case NodeType.BOSS:
+                n.GetComponentInChildren<Button>().transform.Find("Icon").GetComponent<Image>().sprite = battleSprite;
+                break;
+            default:
+                break;
         }
     }
 }
