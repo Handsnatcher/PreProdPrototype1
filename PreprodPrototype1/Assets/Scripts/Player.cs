@@ -47,10 +47,13 @@ public class Player : MonoBehaviour
 
         hitFlash = GetComponent<HitFlash>();
 
-        cameraSystem = Camera.main.GetComponent<DynamicCameraSystem>();
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+            cameraSystem = mainCam.GetComponent<DynamicCameraSystem>();
+
         source = GetComponent<AudioSource>();
         if (cameraSystem == null)
-            Debug.LogWarning("Player: No DynamicCameraSystem found on Main Camera.");
+            Debug.LogWarning("Player: No camera system.");
 
         UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
         defenseSlider.SetActive(false);

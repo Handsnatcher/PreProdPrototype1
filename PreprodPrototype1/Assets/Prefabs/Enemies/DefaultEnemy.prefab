@@ -774,9 +774,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  enemyMaxHealth: 100
+  enemyMaxHealth: 60
   enemyMaxDefense: 50
-  enemyAttackCardDamage: 10
+  enemyAttackCardDamage: 40
   enemyDefenseCardValue: 10
   enemyCurrentHealth: 0
   enemyCurrentDefense: 0

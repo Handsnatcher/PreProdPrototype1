@@ -1123,6 +1123,11 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1309523930}
+    - target: {fileID: 4087191839092156877, guid: 2a043c89e289e704cadd89b4170205ec,
+        type: 3}
+      propertyPath: enemyAttackCardDamage
+      value: 40
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2046,8 +2051,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2656,8 +2662,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: Move
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2790,8 +2797,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
