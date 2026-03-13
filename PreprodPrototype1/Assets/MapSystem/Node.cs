@@ -143,5 +143,6 @@ public class Node : MonoBehaviour
         butColor.disabledColor = new Color(1.0f, 0.5f, 0.5f);
         button.colors = butColor;
         button.interactable = false;
+        button.transform.Find("Icon").GetComponent<Image>().color = new Color(1.0f, 0.5f, 0.5f);
     }
 }
