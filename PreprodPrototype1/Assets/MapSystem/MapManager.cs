@@ -578,6 +578,11 @@ public class MapManager : MonoBehaviour
                 line.pointA = node.GetComponentInChildren<Button>().GetComponent<RectTransform>();
                 line.pointB = n.GetComponentInChildren<Button>().GetComponent<RectTransform>();
 
+                if (!node.isActivated && node.nodeLevel < PlayerPrefs.GetInt("MapLevel"))
+                {
+                    line.GetComponent<Image>().color = Color.gray;
+                }
+
                 lines.Add(line);
             }
         }
