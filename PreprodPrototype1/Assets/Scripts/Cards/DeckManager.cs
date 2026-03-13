@@ -46,21 +46,13 @@ public class DeckManager : MonoBehaviour
         Instance = this;
     }
 
-    private void OnEnable()
+    private void OnDisable()
     {
         if (TurnManager.Instance != null)
         {
-            TurnManager.Instance.OnPlayerTurnStart.AddListener(OnPlayerTurnStarted);
-            TurnManager.Instance.OnPlayerTurnEnd.AddListener(ClearHandVisuals);
-        }
-    }
-
-    private void OnDisable()
-    {
-        if(TurnManager.Instance != null)
-        {
             TurnManager.Instance.OnPlayerTurnStart.RemoveListener(OnPlayerTurnStarted);
             TurnManager.Instance.OnPlayerTurnEnd.RemoveListener(ClearHandVisuals);
+            TurnManager.Instance.OnManaChanged.RemoveListener(OnManaChanged);
         }
     }
 
@@ -99,7 +91,7 @@ public class DeckManager : MonoBehaviour
         ShuffleDeck();
         UpdateDeckUI();
 
-        DrawCards(cardsToDrawPerTurn);
+        //DrawCards(cardsToDrawPerTurn);
     }
 
     /// <summary>
@@ -354,8 +346,10 @@ public class DeckManager : MonoBehaviour
 
     private void Start()
     {
-        if(TurnManager.Instance != null)
+        if (TurnManager.Instance != null)
         {
+            TurnManager.Instance.OnPlayerTurnStart.AddListener(OnPlayerTurnStarted);
+            TurnManager.Instance.OnPlayerTurnEnd.AddListener(ClearHandVisuals);
             TurnManager.Instance.OnManaChanged.AddListener(OnManaChanged);
         }
     }
@@ -364,6 +358,8 @@ public class DeckManager : MonoBehaviour
     {
         if (TurnManager.Instance != null)
         {
+            TurnManager.Instance.OnPlayerTurnStart.RemoveListener(OnPlayerTurnStarted);
+            TurnManager.Instance.OnPlayerTurnEnd.RemoveListener(ClearHandVisuals);
             TurnManager.Instance.OnManaChanged.RemoveListener(OnManaChanged);
         }
     }
