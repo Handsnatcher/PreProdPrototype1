@@ -57,6 +57,7 @@ public class Player : MonoBehaviour
 
         UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
         defenseSlider.SetActive(false);
+        
     }
 
     //DEBUGGING HEALTH
@@ -80,6 +81,7 @@ public class Player : MonoBehaviour
         if (playerCurrentDefense > 0)
         {
             playerCurrentDefense -= enemyDamage;
+            playerCurrentDefense = Mathf.Clamp(playerCurrentDefense, 0, playerMaxDefense);
         }
         else if (playerCurrentDefense <= 0)
         {
