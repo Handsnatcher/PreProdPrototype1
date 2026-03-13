@@ -18,7 +18,7 @@ public class RestManager : MonoBehaviour
         }
         else
         {
-            image.sprite = soloSprite;
+            image.enabled = false;
         }
 
         int playerHP = PlayerPrefs.GetInt("PlayerHealth");

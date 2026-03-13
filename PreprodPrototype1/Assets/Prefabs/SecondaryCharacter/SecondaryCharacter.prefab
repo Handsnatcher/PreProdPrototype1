@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   regenAmount: 2
-  shakeSpeed: 2
-  shakeAmount: 1
+  shakeSpeed: 80
+  shakeAmount: 0.05
 --- !u!1001 &6190590617323939356
 PrefabInstance:
   m_ObjectHideFlags: 0

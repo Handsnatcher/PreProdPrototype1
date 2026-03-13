@@ -11,8 +11,9 @@ public class SecondaryCharacter : MonoBehaviour
 
     //effect
     private bool shouldShake;
-    public float shakeSpeed = 2.0f;
-    public float shakeAmount = 1.0f;
+    private Vector3 startPos;
+    public float shakeSpeed = 0.01f;
+    public float shakeAmount = 0.01f;
     float timer = 0;
 
     void Start()
@@ -49,11 +50,12 @@ public class SecondaryCharacter : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+        startPos = transform.position;
     }
 
     private void ObjShake()
     {
-        Vector3 pos = transform.position;
+        Vector3 pos = startPos;
         pos.x += Mathf.Sin(Time.time * shakeSpeed) * shakeAmount;
         transform.position = pos;
 
