@@ -16,4 +16,4 @@ MonoBehaviour:
   artwork: {fileID: 21300000, guid: ead85b23590e8c246adcbde7d8e9f26a, type: 3}
   type: 0
   manaCost: 1
-  effectValue: 7
+  effectValue: 10

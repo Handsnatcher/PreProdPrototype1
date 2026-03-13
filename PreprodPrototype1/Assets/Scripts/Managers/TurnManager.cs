@@ -13,6 +13,10 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance { get; private set; }
     public EnemyBehaviour enemyBehaviour;
 
+    [Header("Scenes")]
+    public string deathSceneName = "DeathScene";
+    public string mapSceneName = "MapScene";
+
     [Header("Mana Settings")]
     public int maxMana = 3;
 
@@ -46,9 +50,6 @@ public class TurnManager : MonoBehaviour
 
     [Header("Mana Events")]
     public UnityEvent<int, int> OnManaChanged;
-
-    [Header("Scenes")]
-    public string deathSceneName = "DeathScene";
 
     public TurnState CurrentState => currentState;
     public int CurrentMana => currentMana;
@@ -363,6 +364,22 @@ public class TurnManager : MonoBehaviour
         currentMana = maxMana;
         OnManaChanged?.Invoke(currentMana, maxMana);
         UpdateManaText();
+    }
+
+    public void SetVictory()
+    {
+        if (currentState == TurnState.GameOver) return;
+        enemyThinking = false;
+        SetEndTurnButtonActive(false);
+        ShowTurnText("Victory!");
+        Debug.Log("TurnManager: Victory!");
+        StartCoroutine(LoadMapAfterDelay());
+    }
+
+    private IEnumerator LoadMapAfterDelay()
+    {
+        yield return new WaitForSeconds(fadeInDuration + displayDuration + fadeOutDuration);
+        SceneManager.LoadScene(mapSceneName);
     }
 
     // UI HELPERS

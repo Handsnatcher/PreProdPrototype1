@@ -612,8 +612,23 @@ PrefabInstance:
       objectReference: {fileID: 1507332081}
     - target: {fileID: 4087191839092156877, guid: 2a043c89e289e704cadd89b4170205ec,
         type: 3}
+      propertyPath: enemyMaxHealth
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087191839092156877, guid: 2a043c89e289e704cadd89b4170205ec,
+        type: 3}
+      propertyPath: enemyMaxDefense
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087191839092156877, guid: 2a043c89e289e704cadd89b4170205ec,
+        type: 3}
       propertyPath: enemyAttackCardDamage
-      value: 40
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4087191839092156877, guid: 2a043c89e289e704cadd89b4170205ec,
+        type: 3}
+      propertyPath: enemyDefenseCardValue
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -5,13 +5,11 @@ using UnityEngine.UI;
 
 public class CameraScroll : MonoBehaviour
 {
-    public Image bgImage;
     private Vector3 imagePos;
 
     // Start is called before the first frame update
     void Start()
     {
-        imagePos = Camera.main.ScreenToWorldPoint(bgImage.transform.position);
     }
 
     // Update is called once per frame
@@ -23,6 +21,5 @@ public class CameraScroll : MonoBehaviour
             transform.position += Vector3.up * scroll * 200.0f;
         }
 
-        bgImage.transform.position = Camera.main.WorldToScreenPoint(imagePos);
     }
 }
