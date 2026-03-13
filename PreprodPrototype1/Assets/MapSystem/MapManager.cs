@@ -107,7 +107,8 @@ public class MapManager : MonoBehaviour
         nodes[new Vector2Int(0, gridHeight)] = bossNode;
         bossNode.transform.localPosition = new Vector3(0, (gridHeight + 1) * 100, 0);
 
-        bossNode.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = bossNode.nodeType.ToString()[0].ToString();
+        DrawIcon(bossNode);
+        //bossNode.GetComponentInChildren<Button>().GetComponentInChildren<TextMeshProUGUI>().text = bossNode.nodeType.ToString()[0].ToString();
 
         int connectionSize;
         int firstRowConnectionCount = 0;
