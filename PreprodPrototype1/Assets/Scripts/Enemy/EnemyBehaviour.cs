@@ -113,27 +113,33 @@ public class EnemyBehaviour : MonoBehaviour
     //enemy take damage
     public void EnemyTakeDamage(int playerDamage)
     {
-        int finalDamage = Mathf.Max(playerDamage - enemyCurrentDefense, 0);   //to make sure defense doesnt heal enemy on accident
-        enemyCurrentHealth -= finalDamage;
-        enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
-
-        UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
-        UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
-
-        // Hit flash and screen shake when player takes damage
-        hitFlash?.Flash();
-        ScreenShake.Instance?.Shake(0.3f, 0.12f);
-
-        if (enemyCurrentHealth <= 0)
-        {
-            EnemyDeath();
-            TurnManager.Instance.SetVictory();
-        }
 
         //defense down
         if (enemyCurrentDefense <= 0)
         {
             defenseSlider.SetActive(false);
+        }
+
+        if (enemyCurrentDefense > 0)
+        {
+            enemyCurrentDefense -= playerDamage;
+            enemyCurrentDefense = Mathf.Clamp(enemyCurrentDefense, 0, enemyMaxDefense);
+        }
+        else if (enemyCurrentDefense <= 0)
+        {
+            defenseSlider.SetActive(false);
+            enemyCurrentHealth -= playerDamage;
+        }
+
+        enemyCurrentHealth = Mathf.Clamp(enemyCurrentHealth, 0, enemyMaxHealth);
+
+        UpdateEnemyHealthSlider(enemyCurrentHealth, enemyMaxHealth);
+        UpdateEnemyDefenseSlider(enemyCurrentDefense, enemyMaxDefense);
+
+        if (enemyCurrentHealth <= 0)
+        {
+            EnemyDeath();
+            TurnManager.Instance.SetVictory();
         }
     }
 
