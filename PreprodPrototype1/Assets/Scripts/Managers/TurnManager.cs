@@ -114,6 +114,11 @@ public class TurnManager : MonoBehaviour
         }
 
         SetState(TurnState.PlayerTurn);
+        if (DeckManager.Instance.CheckIfEmpty())
+        {
+            DeckManager.Instance.DrawCards(5);
+        }
+
     }
 
     void OnDestroy()

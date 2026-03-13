@@ -344,6 +344,19 @@ public class DeckManager : MonoBehaviour
         }
     }
 
+    public bool CheckIfEmpty()
+    {
+        if (hand.Count == 0)
+        {
+            return true;
+        }
+        else
+        {  
+            return false; 
+        }
+
+    }
+
     private void Start()
     {
         if (TurnManager.Instance != null)
