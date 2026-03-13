@@ -127,6 +127,7 @@ public class EnemyBehaviour : MonoBehaviour
         if (enemyCurrentHealth <= 0)
         {
             EnemyDeath();
+            TurnManager.Instance.SetVictory();
         }
 
         //defense down

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SlamCard
   m_EditorClassIdentifier: 
   cardName: Slam
-  artwork: {fileID: 21300000, guid: 9f6a7117ea073e54eb87661c78d9a674, type: 3}
+  artwork: {fileID: 21300000, guid: 852a204761af72847bf54fb19df90615, type: 3}
   type: 0
   manaCost: 2
-  effectValue: 18
+  effectValue: 20

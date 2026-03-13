@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AttackCard
   m_EditorClassIdentifier: 
   cardName: Attack
-  artwork: {fileID: 21300000, guid: ae76d13892a4da24ba0e5051c6972c67, type: 3}
+  artwork: {fileID: 21300000, guid: ead85b23590e8c246adcbde7d8e9f26a, type: 3}
   type: 0
   manaCost: 1
-  effectValue: 7
+  effectValue: 10

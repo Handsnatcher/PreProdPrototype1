@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefendCard
   m_EditorClassIdentifier: 
   cardName: Defend
-  artwork: {fileID: 21300000, guid: eb7ac3b1dc1b53a42897770be87a3e6a, type: 3}
+  artwork: {fileID: 21300000, guid: 92548adcde3914141b2350950bd7d9ad, type: 3}
   type: 1
   manaCost: 1
   effectValue: 5
