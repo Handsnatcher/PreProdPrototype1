@@ -77,7 +77,22 @@ public class Node : MonoBehaviour
         switch(nodeType)
         {
             case NodeType.BATTLE:
-                SceneManager.LoadScene("JandreTest");
+                if (nodeLevel <= 1)
+                {
+                    SceneManager.LoadScene("JandreTest");
+                }
+                else
+                {
+                    int n = Random.Range(0, 2);
+                    if (n == 0)
+                    {
+                        SceneManager.LoadScene("JandreTest");
+                    }
+                    else
+                    {
+                        SceneManager.LoadScene("01_Battle");
+                    }
+                }
                 break;
             case NodeType.REST:
                 SceneManager.LoadScene("RestScene"); // for debug purpose
