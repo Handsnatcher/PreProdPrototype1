@@ -1078,7 +1078,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 395aaddb398e09c4f897de9b565179bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTarget: {fileID: 0}
+  playerTarget: {fileID: 1799952041}
   enemyTarget: {fileID: 1091885679}
   framingStrength: 0.8
   playerShots:
@@ -1622,6 +1622,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc8cee3eaf14b944d9e87e55ce57d35c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1799952041 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 446760010168648162, guid: d53928ad7e29482468a0899be6799bba,
+    type: 3}
+  m_PrefabInstance: {fileID: 651770072}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1942515015
 GameObject:
   m_ObjectHideFlags: 0
