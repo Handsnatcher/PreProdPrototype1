@@ -125,7 +125,7 @@ public class Node : MonoBehaviour
     {
         button = GetComponentInChildren<Button>();
         ColorBlock butColor = button.colors;
-        butColor.disabledColor = Color.red;
+        butColor.disabledColor = new Color(1.0f, 0.5f, 0.5f);
         button.colors = butColor;
         button.interactable = false;
     }
