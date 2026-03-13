@@ -57,6 +57,7 @@ public class Player : MonoBehaviour
 
         UpdatePlayerHealthSlider(playerCurrentHealth, playerMaxHealth);
         defenseSlider.SetActive(false);
+        
     }
 
     //DEBUGGING HEALTH
