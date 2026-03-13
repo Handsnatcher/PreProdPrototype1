@@ -555,13 +555,12 @@ MonoBehaviour:
   turnText: {fileID: 1491024506}
   manaText: {fileID: 2026970290}
   moveText: {fileID: 1942515017}
-  playerHealthSlider: {fileID: 1650660930}
-  enemyHealthSlider: {fileID: 926097094}
   fadeInDuration: 0.4
   displayDuration: 1.5
   fadeOutDuration: 0.6
   moveUpDistance: 50
   enemyThinkDuration: 2
+  enemies: []
   currentState: 0
   currentMana: 0
   turnCount: 0
@@ -645,8 +644,11 @@ MonoBehaviour:
   torqueStrength: 8
   shardLifetime: 3
   fadeDuration: 0.8
+  shardLayer: 3
   targetCamera: {fileID: 1317043173}
+  soundEffectClip: {fileID: 0}
   debugKey: 1
+  shardRoot: {fileID: 0}
 --- !u!1 &469776287
 GameObject:
   m_ObjectHideFlags: 0
@@ -850,10 +852,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1309523930}
   enemyMaxHealth: 100
+  enemyMaxDefense: 20
   enemyAttackCardDamage: 10
   enemyDefenseCardValue: 10
   enemyCurrentHealth: 0
   enemyCurrentDefense: 0
+  enemyHealthSlider: {fileID: 0}
+  defenseSlider: {fileID: 0}
+  enemyDefenseSlider: {fileID: 0}
+  attackSoundEffect: {fileID: 0}
+  defendSoundEffect: {fileID: 0}
   enemyMesh: {fileID: 0}
   enemyIdle: {fileID: 0}
   enemyAttack: {fileID: 0}
@@ -1279,10 +1287,13 @@ MonoBehaviour:
   handParent: {fileID: 469776288}
   cardUIPrefab: {fileID: 4884188766229371104, guid: 6017dd21d444046478372850a9e210ed,
     type: 3}
+  deckImage: {fileID: 0}
   deckCountText: {fileID: 0}
+  discardImage: {fileID: 0}
   discardCountText: {fileID: 0}
   cardsToDrawPerTurn: 5
   player: {fileID: 1309523930}
+  targetingSystem: {fileID: 0}
   deck: []
   hand: []
   discard: []
@@ -1658,10 +1669,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMaxHealth: 100
   playerCurrentHealth: 0
+  playerMaxDefense: 100
   playerCurrentDefense: 0
   playerAttackCardDamage: 10
   playerDefenseCardValue: 10
   debugKey: 1
+  playerHealthSlider: {fileID: 0}
+  defenseSlider: {fileID: 0}
+  playerDefenseSlider: {fileID: 0}
+  attackSoundEffect: {fileID: 0}
+  defendSoundEffect: {fileID: 0}
 --- !u!64 &1309523931
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1836,6 +1853,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 277909866}
   enemyTarget: {fileID: 564786187}
+  framingStrength: 0.3
   playerShots:
   - positionOffset: {x: -2, y: 1.5, z: -3}
     lookOffset: {x: 0, y: 1, z: 0}

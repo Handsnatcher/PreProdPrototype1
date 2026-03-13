@@ -517,6 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMaxHealth: 100
   playerCurrentHealth: 0
+  playerMaxDefense: 100
   playerCurrentDefense: 0
   playerAttackCardDamage: 10
   playerDefenseCardValue: 10
@@ -524,6 +525,8 @@ MonoBehaviour:
   playerHealthSlider: {fileID: 9129485742604571349}
   defenseSlider: {fileID: 2159497394055776745}
   playerDefenseSlider: {fileID: 7723846975561010600}
+  attackSoundEffect: {fileID: 0}
+  defendSoundEffect: {fileID: 0}
 --- !u!64 &937006177892053278
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -13,7 +13,7 @@ public class EnemyBehaviour : MonoBehaviour
     [Header("Attributes")]
     public int enemyMaxHealth = 60;         //max health
     public int enemyMaxDefense = 20;
-    public int enemyAttackCardDamage = 30;   //damage value when attacking
+    public int enemyAttackCardDamage = 60;   //damage value when attacking
     public int enemyDefenseCardValue = 5;   //how many hit points can it defend itself from
 
     public enum enemyDifficulty { easy, medium, difficult }; //affects "smartness" of AI

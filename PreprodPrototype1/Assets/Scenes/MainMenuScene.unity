@@ -312,7 +312,7 @@ GameObject:
   - component: {fileID: 342632505}
   - component: {fileID: 342632504}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ContinueButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -504,8 +504,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Game
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -638,8 +639,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: ' The Demiurge Crusades'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -772,8 +774,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: Quit
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -908,8 +911,9 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 56f5d871ad3e8a045b7c5f46a4e5473b, type: 2}
+  m_sharedMaterial: {fileID: 2876566542697864943, guid: 56f5d871ad3e8a045b7c5f46a4e5473b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1134,7 +1138,7 @@ GameObject:
   - component: {fileID: 1501083163}
   - component: {fileID: 1501083162}
   m_Layer: 5
-  m_Name: Button
+  m_Name: NewGameButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1280,7 +1284,7 @@ GameObject:
   - component: {fileID: 1580652165}
   - component: {fileID: 1580652164}
   m_Layer: 5
-  m_Name: Button
+  m_Name: QuitButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
